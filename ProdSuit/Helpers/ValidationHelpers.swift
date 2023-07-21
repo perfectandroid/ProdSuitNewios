@@ -227,8 +227,8 @@ class MobileValidator:NSObject,MobileChecker,UITextFieldDelegate{
     
     public func setIndex(index: Int, animated: Bool, scroll: Bool) {
         self.index = index
+        if self.buttons.indices.contains(index){
         let button = self.buttons[index]
-        
         var currentWidth : CGFloat = 0.0
         for i in 0...index {
             currentWidth += self.buttonWidth(button: self.buttons[i])
@@ -254,7 +254,7 @@ class MobileValidator:NSObject,MobileChecker,UITextFieldDelegate{
         if scroll {
             self.scrollView?.contentOffset = CGPoint(x: CGFloat(index) * (scrollView?.frame.size.width)!, y: 0)
         }
-        
+      }
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {

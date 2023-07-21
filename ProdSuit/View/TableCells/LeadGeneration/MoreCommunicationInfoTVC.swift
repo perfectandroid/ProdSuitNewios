@@ -38,28 +38,33 @@ class MoreCommunicationInfoTVC: UITableViewCell,UITextFieldDelegate{
     @IBOutlet weak var countryTF: LeadMoreListingTF!{
         didSet{
             self.countryTF.customPlaceholder(color: AppColor.Shared.greyText, text: "Country")
+            self.countryTF.leftSideImageView.image = UIImage(named: "lead_countrys")
         }
     }
     @IBOutlet weak var stateTF: LeadMoreListingTF!{
         didSet{
             self.stateTF.customPlaceholder(color: AppColor.Shared.greyText, text: "State")
+            self.stateTF.leftSideImageView.image = UIImage(named: "lead_states")
         }
     }
     
     @IBOutlet weak var districtTF: LeadMoreListingTF!{
         didSet{
             self.districtTF.customPlaceholder(color: AppColor.Shared.greyText, text: "District")
+            self.districtTF.leftSideImageView.image = UIImage(named: "lead_districts")
         }
     }
     
     @IBOutlet weak var locationTF: LeadMoreListingTF!{
         didSet{
             self.locationTF.customPlaceholder(color: AppColor.Shared.greyText, text: "Area")
+            self.locationTF.leftSideImageView.image = UIImage(named: "lead_area")
         }
     }
     @IBOutlet weak var postTF: LeadMoreListingTF!{
         didSet{
             self.postTF.customPlaceholder(color: AppColor.Shared.greyText, text: "Post")
+            self.postTF.leftSideImageView.image = UIImage(named: "lead_posts")
         }
     }
     

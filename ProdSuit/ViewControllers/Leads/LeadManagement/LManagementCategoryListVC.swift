@@ -74,6 +74,7 @@ class LManagementCategoryListVC: UIViewController, CXCallObserverDelegate {
         super.viewWillAppear(animated)
         self.lmListTableView.reloadSections(IndexSet(integer: 0), with: .fade)
         
+        
         UIView.animate(withDuration: 0.5) {
             self.lmListTableView.layoutIfNeeded()
         }

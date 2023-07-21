@@ -36,14 +36,17 @@ class LMCategoryDetailsLocationVC: UIViewController,LocationImageApiDelegate {
     var info : LeadImageLocationDetailsModel!
     
     lazy var locationCancellable = Set<AnyCancellable>()
+    
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.apiParserVm = APIParserManager()
         self.parserVm = GlobalAPIViewModel(bgView: self.view)
         
         // Do any additional setup after loading the view.
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -63,9 +66,11 @@ class LMCategoryDetailsLocationVC: UIViewController,LocationImageApiDelegate {
             gmsMapConstraint.append(self.gMapView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: 0))
             gmsMapConstraint.append(self.gMapView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 0))
             gmsMapConstraint.append(self.gMapView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: 0))
-            self.gmsMapCameraViewSetUp(info)
+            
             NSLayoutConstraint.activate(gmsMapConstraint)
             self.view.bringSubviewToFront(gMapView)
+            
+            self.gmsMapCameraViewSetUp(info)
            
         }else{
             self.view.addSubview(messageLabel)
@@ -123,7 +128,7 @@ class LMCategoryDetailsLocationVC: UIViewController,LocationImageApiDelegate {
                 //parserVm.progressBar.showIndicator()
                 parserVm.parseApiRequest(request)
                 parserVm.$responseHandler
-                .dropFirst()
+                .first()
                 .sink { responseHandler in
                     //self.parserVm.progressBar.hideIndicator()
                     let statusCode = responseHandler.statusCode
@@ -148,22 +153,49 @@ class LMCategoryDetailsLocationVC: UIViewController,LocationImageApiDelegate {
     
     func gmsMapCameraViewSetUp(_ datas:LeadImageLocationDetailsModel){
         
-        let latitue = (datas.LocationLatitude == "" ? 0.00 : Double(datas.LocationLatitude))!
+        let latitude = (datas.LocationLatitude == "" ? 0.00 : Double(datas.LocationLatitude))!
         let longitude = datas.LocationLongitude == "" ? 0.00 : Double(datas.LocationLongitude)
-        let camera = GMSCameraPosition.camera(withLatitude: latitue, longitude: longitude!, zoom: 14)
+        let lat = (datas.LocationLatitude as NSString).doubleValue
+        let lon = (datas.LocationLongitude as NSString).doubleValue
+        let camera = GMSCameraPosition.camera(withLatitude: lat, longitude: lon, zoom: 10)
         gMapView.camera = camera
         
         if datas.LocationLatitude != "" && datas.LocationLongitude != ""{
-        let marker = GMSMarker()
-        marker.position = CLLocationCoordinate2D(latitude: latitue, longitude: longitude!)
-        
-            marker.title = datas.LocationName
-        
-        marker.snippet = ""
-        marker.map = self.gMapView
+            let marker = GMSMarker.init()
+            
+            marker.position = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+            
+            let geoCoder = GMSGeocoder()
+            let location2D = CLLocationCoordinate2D.init(latitude: lat, longitude: lon)
+            geoCoder.reverseGeocodeCoordinate(location2D) { response, error in
+                if  let addressArray = response?.results() as? [GMSAddress]{
+                    print(addressArray)
+                    
+                    let locAddress = self.displayLocationInfo(placemark: addressArray)
+                    marker.snippet =  locAddress
+                    
+                }
+                
+            }
+            
+            
+           
+            marker.map = self.gMapView
         }
         
     }
+    
+    func displayLocationInfo(placemark: [GMSAddress]) -> String    {
+
+           
+
+           var adr: String  = ""
+
+        let addressInfo = placemark[0]
+           
+        adr = addressInfo.lines![0]
+        return adr
+       }
     
 
     /*

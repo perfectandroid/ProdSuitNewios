@@ -42,6 +42,9 @@ let fk_branch = "\(preference.User_FK_Branch)"
 
 let fk_department = "\(preference.User_FK_DepartMent)"
 
+var punch_loc_coordinate : (Double,Double) = (0,0)
+var punch_address : String = ""
+
 
 
 

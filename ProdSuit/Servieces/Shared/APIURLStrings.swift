@@ -9,16 +9,30 @@ import Foundation
 import UIKit
 
 // BASE URL
+
+//DEVELOPMENT
 let APIBaseUrl = "https://202.164.150.65:14271/ProdsuiteAPI/"
 let APIImageUrl = "https://202.164.150.65:14271/ProdsuiteAPI"
+
+//TESTING
+//let APIBaseUrl = "https://202.164.150.65:14271/PSuiteUATAPI/"
+//let APIImageUrl = "https://202.164.150.65:14271/PSuiteUATAPI"
+
+
 
 // BASE URL PART
 let APIBaseUrlPart = "api/"
 let PATH_OF_YOUR_CERT = "cer"
-let OriginalCertName = "STATIC-VM01"
+
+
+//let APP_TESTING_TYPE = "QA"
+let APP_TESTING_TYPE = "DEVELOPMENT"
+
+let OriginalCertName =  APP_TESTING_TYPE == "QA" ? "PRODSUIT-UAT" : "STATIC-VM01"
+
 
 // BANK KEY
-let BankKey = "-500"
+let BankKey = APP_TESTING_TYPE == "QA" ? "-501" : "-500"
 let SKey = "PssErp22"
 let encryptionEndValue = "=\n"
 
@@ -125,6 +139,8 @@ struct RequestMode{
     
     let walkInCustomer = "107" // walk in customer
     
+    let generalSettings = "91"
+    
     // SERVICE
     
     let paymentMethod = "92"
@@ -222,6 +238,8 @@ struct URLPathList{
     let leadUploadDocuments = "UserValidations/AddDocument"
     let leadGeneration = "UserValidations/UpdateLeadGeneration"
     let leadWalkingCustomer = "UserValidations/WalkingCustomerDetailsList"
+    let getGeneralSettings = "UserValidations/GetGenralSettings"
+    let barcodeSearch =  "UserValidations/ItemSearchList"
     
     // LEAD MANAGEMENT APIS
     
@@ -261,6 +279,10 @@ struct URLPathList{
     // SERVICE
     let PaymentMethod = "ServiceFollowUp/FollowUpPaymentMethod"
     
+    
+    // ATTENDANCE MARKING
+    
+    let updateAttendanceMarking = "UserValidations/AttanceMarkingUpdate"
     
     
     

@@ -243,7 +243,7 @@ class LRSideImageViewTF:UITextField{
     lazy var rightSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
-        imgView.image = rightDownImage!
+        imgView.image = rightDownImage
         imgView.tintColor = AppColor.Shared.coloBlack
         return imgView
     }()
@@ -344,4 +344,113 @@ class CircleCornerView:UIView{
 
            self.layer.cornerRadius = radius
        }
+}
+
+class PunchPopUpTitleLbl:UILabel{
+    override func awakeFromNib() {
+        self.font = AppFont.semiBold.size(15)
+        self.textAlignment = .center
+        self.setTextColor(AppColor.Shared.coloBlack)
+    }
+}
+
+class PunchPopUpTextLbl:UILabel{
+    override func awakeFromNib() {
+        self.font = AppFont.regular.size(14)
+        self.setTextColor(AppColor.Shared.coloBlack)
+    }
+}
+
+class PunchPopUpYesBtn:UIButton{
+    override func awakeFromNib() {
+        self.titleLabel?.setFontSize(14, font: AppFont.medium, autoScale: true)
+        self.titleLabel?.setTextColor(AppColor.Shared.colorWhite)
+        self.setCornerRadius(size: 5)
+        self.setBGColor(color: AppColor.Shared.punchYesColor)
+       
+    }
+}
+
+
+class PunchPopUpNoBtn:UIButton{
+    override func awakeFromNib() {
+        self.titleLabel?.setFontSize(14, font: AppFont.medium, autoScale: true)
+        self.titleLabel?.setTextColor(AppColor.Shared.colorWhite)
+        self.setCornerRadius(size: 5)
+        self.setBGColor(color: AppColor.Shared.colorPrimary)
+       
+    }
+}
+
+class PunchCancelBtn:UIButton{
+    override func awakeFromNib() {
+        self.titleLabel?.setFontSize(14, font: AppFont.medium, autoScale: true)
+        self.titleLabel?.setTextColor(AppColor.Shared.coloBlack)
+        
+        self.setBGColor(color: AppColor.Shared.D6D6D6)
+       
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let shaplayer = CAShapeLayer()
+         shaplayer.path = UIBezierPath.init(roundedRect: self.bounds, byRoundingCorners: UIRectCorner.bottomLeft, cornerRadii: CGSize(width: 8, height: 8)).cgPath
+             self.layer.mask = shaplayer
+    }
+}
+
+
+class PunchConfirmBtn:UIButton{
+    override func awakeFromNib() {
+        self.titleLabel?.setFontSize(14, font: AppFont.medium, autoScale: true)
+        self.titleLabel?.setTextColor(AppColor.Shared.colorWhite)
+       
+        
+
+        self.setBGColor(color: AppColor.Shared.colorPrimary)
+       
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        let shaplayer = CAShapeLayer()
+         shaplayer.path = UIBezierPath.init(roundedRect: self.bounds, byRoundingCorners: UIRectCorner.bottomRight, cornerRadii: CGSize(width: 8, height: 8)).cgPath
+             self.layer.mask = shaplayer
+    }
+}
+
+
+class PunchTitleLbl:UILabel{
+    override func awakeFromNib() {
+        self.font = AppFont.semiBold.size(13)
+        self.setTextColor(AppColor.Shared.coloBlack)
+    }
+}
+
+class PunchTextLbl:UILabel{
+    var setColor:UIColor = AppColor.Shared.greyText{
+        didSet{
+            self.setTextColor(setColor)
+        }
+    }
+    override func awakeFromNib() {
+        self.font = AppFont.regular.size(12)
+        self.setTextColor(setColor)
+        
+    }
+}
+
+class PunchNameLbl:UILabel{
+    override func awakeFromNib() {
+        self.font = AppFont.medium.size(16)
+        self.setTextColor(AppColor.Shared.coloBlack)
+    }
+}
+
+class PunchUserImageView:UIImageView{
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        self.layer.cornerRadius = self.frame.width/2
+        self.setBorder(width: 1.5, borderColor: AppColor.Shared.redDark)
+    }
 }

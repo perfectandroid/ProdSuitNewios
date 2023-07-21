@@ -7,17 +7,21 @@
 
 import UIKit
 
-class LeadsVC: UIViewController {
+class LeadsVC: UIViewController,GeneralSettingAPIProtocol {
     
     @IBOutlet weak var leadManagementView: RoundCornerView!
     @IBOutlet weak var leadGenerationView: RoundCornerView!
     
     @IBOutlet weak var walkingCustomerView: BorderView!
     
+    let commonNetworkVM = SharedNetworkCall.Shared
+    
     //var DashboardNavController : UINavigationController?
     weak var leadsVm : LeadsVCViewModel?
     
     var leadGenerationDefaultValueSettingsInfo : LeadGenerationDefaultValueModel!
+    
+    
 
     fileprivate func setUI() {
         self.leadGenerationView.setBGColor(color: AppColor.Shared.leadGenColor)
@@ -30,10 +34,26 @@ class LeadsVC: UIViewController {
         print("leads vc")
         
         setUI()
-       
+        getGeneralSettingsAPICall()
+        
         
         // Do any additional setup after loading the view.
     }
+    
+    func getGeneralSettingsAPICall(){
+        self.getGeneralSettingsAPICall(commonNetworkVM: commonNetworkVM) { gsValue in
+            print("general settings:\(gsValue)")
+            let walk_inCustomerHide = gsValue == true ? false : true
+            
+            self.walkingCustomerView.subviews.map{ $0.isHidden = walk_inCustomerHide }
+            self.walkingCustomerView.isHidden = walk_inCustomerHide
+            UIView.animate(withDuration: 0.01) {
+                
+                self.walkingCustomerView.superview?.layoutIfNeeded()
+            }
+        }
+    }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -41,7 +61,13 @@ class LeadsVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        
+        
         leadsVm = LeadsVCViewModel(controller: self)
+        
+        getGeneralSettingsAPICall()
+        
     }
     
     @IBAction func backButtonAction(_ sender: BackButtonCC) {
@@ -58,7 +84,7 @@ class LeadsVC: UIViewController {
         DispatchQueue.main.asyncAfter(deadline: .now()+0.45) {
             let leadGenerationPage = AppVC.Shared.leadGenerationPage
             //leadGenerationPage.DashboardNavController = self.DashboardNavController
-            
+            //leadGenerationPage.expandedSectionHeaderNumber = -1
             leadGenerationPage.leadGenerationDefaultValueSettingsInfo = self.leadGenerationDefaultValueSettingsInfo
             DispatchQueue.main.async {[weak self] in
                 if !(self?.allControllers.contains(leadGenerationPage))!{

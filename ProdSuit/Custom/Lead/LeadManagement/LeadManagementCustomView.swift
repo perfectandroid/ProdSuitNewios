@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import JACalendar
 
 class PendingCountLabel:UILabel{
     
@@ -23,7 +24,7 @@ class PendingCountTitleLabel:UILabel{
     
     override func awakeFromNib() {
         
-        self.font = AppFonts.Shared.Medium.withSize(16)
+        self.font = AppFonts.Shared.Medium.withSize(userDevice == .pad ? ipadSizeFactor * 16 : 16)
         
     }
 }
@@ -31,7 +32,7 @@ class PendingCountTitleLabel:UILabel{
 class FilterLabel:UILabel{
     override func awakeFromNib() {
         
-        self.font = AppFonts.Shared.Medium.withSize(17)
+        self.font = AppFonts.Shared.Medium.withSize(userDevice == .pad ? ipadSizeFactor * 17 : 17)
         self.textColor = AppColor.Shared.coloBlack
         self.textAlignment = .center
     }
@@ -40,7 +41,7 @@ class FilterLabel:UILabel{
 class FilterTF:UITextField{
     override func awakeFromNib() {
         
-        self.font = AppFonts.Shared.Regular.withSize(15)
+        self.font = AppFonts.Shared.Regular.withSize(userDevice == .pad ? ipadSizeFactor * 15 : 15)
         self.textColor = AppColor.Shared.greyText
         self.customPlaceholder(color: AppColor.Shared.hintTextColor, text: "Employee")
         self.setCornerRadius(size: 5)
@@ -53,7 +54,7 @@ class FilterTF:UITextField{
 class FilterListEmployeeTF:UITextField{
     override func awakeFromNib() {
         
-        self.font = AppFonts.Shared.Regular.withSize(15)
+        self.font = AppFonts.Shared.Regular.withSize(userDevice == .pad ? ipadSizeFactor * 15 : 15)
         self.textColor = AppColor.Shared.greyText
         self.customPlaceholder(color: AppColor.Shared.hintTextColor, text: self.placeholder ?? "")
         self.setCornerRadius(size: 5)
@@ -68,7 +69,7 @@ class FilterListEmployeeTF:UITextField{
 class FilterListTF:UITextField{
     override func awakeFromNib() {
         
-        self.font = AppFonts.Shared.Regular.withSize(15)
+        self.font = AppFonts.Shared.Regular.withSize(userDevice == .pad ? ipadSizeFactor * 15 : 15)
         self.textColor = AppColor.Shared.greyText
         self.customPlaceholder(color: AppColor.Shared.hintTextColor, text: self.placeholder ?? "")
         self.setCornerRadius(size: 5)
@@ -96,7 +97,7 @@ class FilterRightViewTF:UITextField{
     
     override func awakeFromNib() {
         self.inputView = UIView()
-        self.font = AppFonts.Shared.Regular.withSize(15)
+        self.font = AppFonts.Shared.Regular.withSize(userDevice == .pad ? ipadSizeFactor * 15 : 15)
         self.textColor = AppColor.Shared.greyText
         self.customPlaceholder(color: AppColor.Shared.hintTextColor, text: self.placeholder ?? "")
         self.inputView = UIView()
@@ -129,7 +130,7 @@ class FilterSubmitBtn:UIButton{
     override func awakeFromNib() {
         self.titleLabel?.textColor = AppColor.Shared.colorWhite
         self.titleLabel?.text = "OK"
-        self.titleLabel?.font = AppFont.semiBold.size(15)
+        self.titleLabel?.font = AppFont.semiBold.size(userDevice == .pad ? ipadSizeFactor * 15 : 15)
         self.backgroundColor = AppColor.Shared.color_submit2
         
         
@@ -145,7 +146,7 @@ class FilterCancelBtn:UIButton{
     override func awakeFromNib() {
         self.titleLabel?.textColor = AppColor.Shared.coloBlack
         self.titleLabel?.text = "CANCEL"
-        self.titleLabel?.font = AppFont.semiBold.size(15)
+        self.titleLabel?.font = AppFont.semiBold.size(userDevice == .pad ? ipadSizeFactor * 15 : 15)
         self.backgroundColor = AppColor.Shared.color_reset1
         
         
@@ -158,7 +159,7 @@ class LMPriorityLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.colorWhite)
-        self.setFontSize(11, font: .regular)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 11 : 11, font: .regular)
     }
 }
 
@@ -166,7 +167,7 @@ class LMDateLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.colorWhite)
-        self.setFontSize(11, font: .medium)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 11 : 11, font: .medium)
     }
 }
 
@@ -174,7 +175,7 @@ class LMTicketLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.coloBlack)
-        self.setFontSize(13, font: .medium)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 13 : 13, font: .medium)
     }
 }
 
@@ -182,7 +183,7 @@ class LMLNameLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.coloBlack)
-        self.setFontSize(18, font: .semiBold)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 18 : 18, font: .semiBold)
     }
 }
 
@@ -190,7 +191,7 @@ class LMLAddressLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.greyText)
-        self.setFontSize(13, font: .regular)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 13 : 13, font: .regular)
     }
 }
 
@@ -198,7 +199,7 @@ class LMLMobLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.greyText)
-        self.setFontSize(13, font: .regular)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 13 : 13, font: .regular)
     }
 }
 
@@ -206,7 +207,7 @@ class LMLProductLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.greyText)
-        self.setFontSize(10, font: .regular)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 10 : 10, font: .regular)
     }
 }
 
@@ -214,7 +215,7 @@ class LMLActionDateLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.greyText)
-        self.setFontSize(10, font: .regular)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 10 : 10, font: .regular)
     }
 }
 
@@ -222,7 +223,7 @@ class LMLActionLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.greyText)
-        self.setFontSize(10, font: .regular)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 10 : 10, font: .regular)
     }
 }
 
@@ -230,7 +231,7 @@ class LMLCollectedByLB:UILabel{
     
     override func awakeFromNib() {
         self.setTextColor(AppColor.Shared.greyText)
-        self.setFontSize(10, font: .regular)
+        self.setFontSize(userDevice == .pad ? ipadSizeFactor * 10 : 10, font: .regular)
     }
 }
 
@@ -242,7 +243,7 @@ class LMMSubmitBtn:UIButton{
     override func awakeFromNib() {
         self.titleLabel?.textColor = AppColor.Shared.colorWhite
         self.titleLabel?.text = "Submit"
-        self.titleLabel?.font = AppFont.semiBold.size(15)
+        self.titleLabel?.font = AppFont.semiBold.size(userDevice == .pad ? ipadSizeFactor * 15 : 15)
         self.backgroundColor = AppColor.Shared.p_green
         
         
@@ -258,7 +259,7 @@ class LMMCancelBtn:UIButton{
     override func awakeFromNib() {
         self.titleLabel?.textColor = AppColor.Shared.coloBlack
         self.titleLabel?.text = "Cancel"
-        self.titleLabel?.font = AppFont.semiBold.size(15)
+        self.titleLabel?.font = AppFont.semiBold.size(userDevice == .pad ? ipadSizeFactor * 15 : 15)
         self.backgroundColor = AppColor.Shared.greydark
         
         
@@ -410,6 +411,9 @@ protocol LMCDDocUploadDateDelegate:AnyObject{
 class LMCDDocUploadDateTF:UITextField{
     
     weak var docDateDeleagate : LMCDDocUploadDateDelegate?
+    var hasInitialDateRepresentation : Bool = false
+    var docCalenderTheme = JACalendarTheme()
+    var controller:UIViewController?
     lazy var leftSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
@@ -418,8 +422,16 @@ class LMCDDocUploadDateTF:UITextField{
         return imgView
     }()
     
+    lazy var docCalenderButton : UIButton = {
+        let btn  = UIButton()
+        btn.titleLabel?.setLabelValue("")
+        btn.setBGColor(color: UIColor.clear)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
     let calendarImage:UIImage = UIImage(named: "leadcalendar")!
-    let datePickerView = UIDatePicker()
+    
     
     lazy var leftSideView: UIView = {
         let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 50, height: self.frame.height))
@@ -442,36 +454,36 @@ class LMCDDocUploadDateTF:UITextField{
         self.setCornerRadius(size: 5)
         self.setTextColor(AppColor.Shared.greyText)
         self.setFontSize(14, font: .regular)
-        self.text = DateTimeModel.shared.stringDateFromDate(Date())
+        //self.text = DateTimeModel.shared.stringDateFromDate(Date())
         self.tintColor = UIColor.clear
         initializeDate()
     }
        
         func initializeDate(){
-            datePickerView.datePickerMode = .date
-            if #available(iOS 13.4, *) {
-                datePickerView.preferredDatePickerStyle = .compact
-            } else {
-                // Fallback on earlier versions
-            }
-            self.inputView = datePickerView
-            datePickerView.addTarget(self, action: #selector(datePickerValueChanged(sender:)), for: .valueChanged)
-        
+            
+            self.addSubview(docCalenderButton)
+            self.docCalenderButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
+            
+            self.docCalenderButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 0).isActive = true
+            
+            self.docCalenderButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+            
+            self.docCalenderButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
+            
+            docCalenderTheme.nextMonthImage = UIImage(named: "next")
+            docCalenderTheme.previousMonthImage = UIImage(named: "back")
+            docCalenderTheme.selectedDayColor = AppColor.Shared.colorPrimary
+            
+            docCalenderButton.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .touchDown)
+            
         }
         
-       @objc func datePickerValueChanged(sender:UIDatePicker) {
-
-                let dateFormatter = DateFormatter()
-
-                dateFormatter.dateStyle = DateFormatter.Style.medium
-
-                dateFormatter.timeStyle = DateFormatter.Style.none
-
-               self.text = DateTimeModel.shared.stringDateFromDate(sender.date)
-            self.docDateDeleagate?.getDate(date: DateTimeModel.shared.stringDateFromDate(sender.date))
-               self.resignFirstResponder()
-
-            }
+       @objc func datePickerValueChanged(_ sender : UIButton) {
+           
+           JACalendar.show(from: controller!, theme: docCalenderTheme) { (date) in
+               self.setTextFieldValue(DateTimeModel.shared.stringDateFromDate(date))
+               self.docDateDeleagate?.getDate(date:DateTimeModel.shared.stringDateFromDate(date))
+           }}
     
         
     
@@ -541,7 +553,7 @@ class FollowUpActionTypeTF:UITextField{
     lazy var rightSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
-        imgView.image = rightDownImage!
+        imgView.image = rightDownImage
         imgView.tintColor = AppColor.Shared.greydark
         return imgView
     }()
@@ -597,7 +609,7 @@ class FollowUpByTF:UITextField{
     lazy var rightSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
-        imgView.image = rightDownImage!
+        imgView.image = rightDownImage
         imgView.tintColor = AppColor.Shared.greydark
         return imgView
     }()
@@ -652,7 +664,7 @@ class FollowUpStatusTF:UITextField{
     lazy var rightSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
-        imgView.image = rightDownImage!
+        imgView.image = rightDownImage
         imgView.tintColor = AppColor.Shared.greydark
         return imgView
     }()
@@ -708,7 +720,7 @@ class FollowUpCallTF:UITextField{
     lazy var rightSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
-        imgView.image = rightDownImage!
+        imgView.image = rightDownImage
         imgView.tintColor = AppColor.Shared.greydark
         return imgView
     }()
@@ -754,6 +766,9 @@ class FollowUpCallTF:UITextField{
 class FollowUPDateTF:UITextField{
     
     weak var docDateDeleagate : LMCDDocUploadDateDelegate?
+   
+    var FollowUPDateCalenderTheme = JACalendarTheme()
+    var controller:UIViewController?
     lazy var leftSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
@@ -762,8 +777,16 @@ class FollowUPDateTF:UITextField{
         return imgView
     }()
     
+    lazy var followUPDateCalenderButton : UIButton = {
+        let btn  = UIButton()
+        btn.titleLabel?.setLabelValue("")
+        btn.setBGColor(color: UIColor.clear)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
     let calendarImage:UIImage = UIImage(named: "fd_date")!
-    let datePickerView = UIDatePicker()
+    
     
     lazy var leftSideView: UIView = {
         let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 50, height: self.frame.height))
@@ -792,30 +815,34 @@ class FollowUPDateTF:UITextField{
     }
        
         func initializeDate(){
-            datePickerView.datePickerMode = .date
-            if #available(iOS 13.4, *) {
-                datePickerView.preferredDatePickerStyle = .compact
-            } else {
-                // Fallback on earlier versions
-            }
-            self.inputView = datePickerView
-            datePickerView.addTarget(self, action: #selector(datePickerValueChanged(sender:)), for: .valueChanged)
+            
+            self.addSubview(followUPDateCalenderButton)
+            self.followUPDateCalenderButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
+            
+            self.followUPDateCalenderButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 0).isActive = true
+            
+            self.followUPDateCalenderButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+            
+            self.followUPDateCalenderButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
+            
+            FollowUPDateCalenderTheme.nextMonthImage = UIImage(named: "next")
+            FollowUPDateCalenderTheme.previousMonthImage = UIImage(named: "back")
+            FollowUPDateCalenderTheme.selectedDayColor = AppColor.Shared.colorPrimary
+            
+            followUPDateCalenderButton.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .touchDown)
         
         }
         
-       @objc func datePickerValueChanged(sender:UIDatePicker) {
+       @objc func datePickerValueChanged(_ sender : UIButton) {
 
-                let dateFormatter = DateFormatter()
+           JACalendar.show(from: controller!, theme: FollowUPDateCalenderTheme) { date in
+               
+               self.setTextFieldValue(DateTimeModel.shared.stringDateFromDate(date))
+               self.docDateDeleagate?.getDate(date: DateTimeModel.shared.stringDateFromDate(date))
+               }
 
-                dateFormatter.dateStyle = DateFormatter.Style.medium
-
-                dateFormatter.timeStyle = DateFormatter.Style.none
-
-               self.text = DateTimeModel.shared.stringDateFromDate(sender.date)
-            self.docDateDeleagate?.getDate(date: DateTimeModel.shared.stringDateFromDate(sender.date))
-               self.resignFirstResponder()
-
-            }
+            
+       }
     
         
     
@@ -902,7 +929,7 @@ class NextActionTF:UITextField{
     lazy var rightSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
-        imgView.image = rightDownImage!
+        imgView.image = rightDownImage
         imgView.tintColor = AppColor.Shared.greydark
         return imgView
     }()
@@ -948,6 +975,8 @@ class NextActionTF:UITextField{
 class NextActionDateTF:UITextField{
     
     weak var docDateDeleagate : LMCDDocUploadDateDelegate?
+    var NextActionDateCalenderTheme = JACalendarTheme()
+    var controller:UIViewController?
     lazy var leftSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
@@ -957,13 +986,21 @@ class NextActionDateTF:UITextField{
     }()
     
     let calendarImage:UIImage = UIImage(named: "fd_nextfollowdate")!
-    let datePickerView = UIDatePicker()
+    //let datePickerView = UIDatePicker()
     
     lazy var leftSideView: UIView = {
         let containerView = UIView(frame: CGRect(x: 0, y: 0, width: 50, height: self.frame.height))
         //containerView.backgroundColor = AppColor.Shared.purple_500
         
         return containerView
+    }()
+    
+    lazy var NextActionDateCalenderButton : UIButton = {
+        let btn  = UIButton()
+        btn.titleLabel?.setLabelValue("")
+        btn.setBGColor(color: UIColor.clear)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
     }()
     
     var imageConstraint = [NSLayoutConstraint]()
@@ -986,30 +1023,31 @@ class NextActionDateTF:UITextField{
     }
        
         func initializeDate(){
-            datePickerView.datePickerMode = .date
-            if #available(iOS 13.4, *) {
-                datePickerView.preferredDatePickerStyle = .compact
-            } else {
-                // Fallback on earlier versions
-            }
-            self.inputView = datePickerView
-            datePickerView.addTarget(self, action: #selector(datePickerValueChanged(sender:)), for: .valueChanged)
+           
+            self.addSubview(NextActionDateCalenderButton)
+            self.NextActionDateCalenderButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
+            
+            self.NextActionDateCalenderButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 0).isActive = true
+            
+            self.NextActionDateCalenderButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+            
+            self.NextActionDateCalenderButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
+            
+            NextActionDateCalenderTheme.nextMonthImage = UIImage(named: "next")
+            NextActionDateCalenderTheme.previousMonthImage = UIImage(named: "back")
+            NextActionDateCalenderTheme.selectedDayColor = AppColor.Shared.colorPrimary
+            
+            NextActionDateCalenderButton.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .touchDown)
         
         }
         
-       @objc func datePickerValueChanged(sender:UIDatePicker) {
+       @objc func datePickerValueChanged(_ sender : UIButton) {
 
-                let dateFormatter = DateFormatter()
-
-                dateFormatter.dateStyle = DateFormatter.Style.medium
-
-                dateFormatter.timeStyle = DateFormatter.Style.none
-
-               self.text = DateTimeModel.shared.stringDateFromDate(sender.date)
-            self.docDateDeleagate?.getDate(date: DateTimeModel.shared.stringDateFromDate(sender.date))
-               self.resignFirstResponder()
-
-            }
+           JACalendar.show(from: controller!, theme: NextActionDateCalenderTheme) { date in
+               
+               self.setTextFieldValue(DateTimeModel.shared.stringDateFromDate(date))
+               self.docDateDeleagate?.getDate(date: DateTimeModel.shared.stringDateFromDate(date))
+               }}
     
         
     
@@ -1029,7 +1067,7 @@ class NextActionPriorityTF:UITextField{
     lazy var rightSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
-        imgView.image = rightDownImage!
+        imgView.image = rightDownImage
         imgView.tintColor = AppColor.Shared.greydark
         return imgView
     }()
@@ -1084,7 +1122,7 @@ class NextActionDepartMentTF:UITextField{
     lazy var rightSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
-        imgView.image = rightDownImage!
+        imgView.image = rightDownImage
         imgView.tintColor = AppColor.Shared.greydark
         return imgView
     }()
@@ -1139,7 +1177,7 @@ class NextActionEmployeeTF:UITextField{
     lazy var rightSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
         imgView.translatesAutoresizingMaskIntoConstraints = true
-        imgView.image = rightDownImage!
+        imgView.image = rightDownImage
         imgView.tintColor = AppColor.Shared.greydark
         return imgView
     }()
@@ -1181,5 +1219,21 @@ class NextActionEmployeeTF:UITextField{
     
 }
 
+class ProductAddTableView: UITableView {
+  override var intrinsicContentSize: CGSize {
+      self.layoutIfNeeded()
+      return self.contentSize
+  }
 
+  override var contentSize: CGSize {
+      didSet{
+          self.invalidateIntrinsicContentSize()
+      }
+  }
+
+  override func reloadData() {
+      super.reloadData()
+      self.invalidateIntrinsicContentSize()
+  }
+}
 

@@ -27,9 +27,9 @@ class SideMenuHeaderTVC: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func configureCellDetails(){
+    func configureCellDetails(userName:String){
         
-        cellNameLabel.text = preference.User_UserName
+        cellNameLabel.text = userName
         cellNameLabel.textColor = AppColor.Shared.colorWhite
         cellNameLabel.font = AppFonts.Shared.Medium.withSize(18)
         cellDateLabel.text = preference.User_LoggedDate

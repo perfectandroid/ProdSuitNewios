@@ -23,6 +23,18 @@ var textViewPublisher:AnyPublisher<String,Never>{
         .eraseToAnyPublisher()
 }
 
+var backGroundPublisher:AnyPublisher<String,Never>{
+    NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
+        .compactMap{ ($0.object as? String ?? "inactive") }
+        .eraseToAnyPublisher()
+}
+
+var foreGroundPublisher:AnyPublisher<String,Never>{
+    NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
+        .compactMap{ ($0.object as? String ?? "active") }
+        .eraseToAnyPublisher()
+}
+
 struct DateTimeModel{
     
     static let shared = DateTimeModel()
@@ -64,11 +76,30 @@ struct DateTimeModel{
 
             let outputFormatter = DateFormatter()
           outputFormatter.dateFormat = format
-
+            
+            
             return outputFormatter.string(from: date)
         }
 
         return nil
+    }
+    
+    func changeDateFormate(dateString: String, withFormat format: String="yyyy-MM-dd") -> String{
+        let inputFormatter = DateFormatter()
+        let outputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "dd-MM-yyyy"
+
+        var outputDateString = ""
+        if let date = inputFormatter.date(from: dateString){
+
+            
+        outputFormatter.dateFormat = format
+            
+            
+        outputDateString = outputFormatter.string(from: date)
+        }
+        
+        return outputDateString
     }
     
     func combineDateAndTime(date:String,time:String) -> Date {
@@ -89,7 +120,16 @@ struct DateTimeModel{
         return dateFormatter.string(from: date)
     }
     
-    func fetchTime(timeFormate:String="HH:mm:ss")->String{
+    func timeFromString(_ timeString:String)->String?{
+        let dateFormatter = DateFormatter()
+        if let getdate = dateFormatter.date(from: timeString){
+        dateFormatter.dateFormat = "h:mm:ss a"
+        return dateFormatter.string(from: getdate)
+        }
+        return nil
+    }
+    
+    func fetchTime(timeFormate:String="h:mm:ss")->String{
         let date = Date()
         let df = DateFormatter()
         df.dateFormat = timeFormate
@@ -97,4 +137,23 @@ struct DateTimeModel{
         return dateString
     }
     
+    func fetchCurrentDateAndTime(dateFormate:String="dd-MM-yyyy",timeFormate:String="h:mm:ss")->(date:String,time:String){
+        let date = Date()
+        let dateDF = DateFormatter()
+        dateDF.dateFormat = dateFormate
+        let timeDF = DateFormatter()
+        timeDF.dateFormat = timeFormate
+        let dateString = dateDF.string(from: date)
+        let timeString = timeDF.string(from: date)
+        return(date:dateString,time:timeString)
+    }
+    
 }
+
+
+
+
+
+
+
+

@@ -15,6 +15,10 @@ protocol ProductEnquiryDelegate:AnyObject{
     func getEnquiryText(text:String)
 }
 
+protocol ProductOfferPriceDelegate:AnyObject{
+    func getOfferPrice(value:String)
+}
+
 protocol QuantityDelegate:AnyObject{
     func maxQuantity(cell:ProjectProductDetailsTVC,qty:String)
 }
@@ -23,16 +27,26 @@ class ProjectProductDetailsTVC: UITableViewCell{
     
     fileprivate func enableDisableFollowUpView(isEnabled:Bool) {
         UIView.animate(withDuration: 0.25, animations: {
-            self.followUpView.isHidden = true
-            self.followUpView.subviews.map{ $0.isHidden = true }
+//            self.followUpView.isHidden = true
+//            self.followUpView.subviews.map{ $0.isHidden = true }
             self.actionTextField.isHidden = isEnabled
             self.actionTypeTextField.isHidden = isEnabled
             self.dateTextField.isHidden = isEnabled
             self.nameTextField.isHidden = isEnabled
             self.dateTextField.dateTodayOnwards = true
-            self.productStackView.layoutIfNeeded()
+            
+            UIView.animate(withDuration: 0.1, delay: 0) {
+                
+                self.productStackView.layoutIfNeeded()
+                self.layoutIfNeeded()
+            }
+           
         })
     }
+    
+    
+    @IBOutlet weak var expectedDateTF: LeadExpaectedDateTF!
+        
     
     var hasFollowUp:Bool?{
         didSet{
@@ -72,7 +86,8 @@ class ProjectProductDetailsTVC: UITableViewCell{
                
                 
                     self.actionTextField.isHidden = true
-                    self.subCategoryQtyTextField.isHidden = true
+                    
+                    self.subCategoryQtyTextField.isHidden = false
                     self.subCategoryTextField.customPlaceholder(color: AppColor.Shared.greyText, text: "Model")
                     self.subCategoryTextField.rightView = nil
                 self.subCategoryTextField.addDonButton()
@@ -104,6 +119,18 @@ class ProjectProductDetailsTVC: UITableViewCell{
     
     @IBOutlet weak var subCategoryQtyTextField: UITextField!
     
+    @IBOutlet weak var mrpTextField: ProjectDetailsMRPTF!{
+        didSet{
+            mrpTextField.delegate = self
+            self.mrpTextField.addDonButton()
+        }
+    }
+    @IBOutlet weak var offerPriceTextField: ProjectDetailsOfferTF!{
+        didSet{
+            offerPriceTextField.delegate = self
+            self.offerPriceTextField.addDonButton()
+        }
+    }
     @IBOutlet weak var priorityTextField: ProjectDetailsPriorityTF!{
         didSet{
             
@@ -112,6 +139,7 @@ class ProjectProductDetailsTVC: UITableViewCell{
         }
     }
     
+    @IBOutlet weak var scaningButton: UIButton!
     @IBOutlet weak var enquiryNoteTextField: ProjectDetailEnquiryNoteTF!{
         didSet{
             
@@ -129,7 +157,7 @@ class ProjectProductDetailsTVC: UITableViewCell{
     }
     
     
-    @IBOutlet weak var followUpView: UIView!
+    //@IBOutlet weak var followUpView: UIView!
     
     @IBOutlet weak var actionTextField: UITextField!
     
@@ -146,14 +174,59 @@ class ProjectProductDetailsTVC: UITableViewCell{
             
             dateTextField.setBorder(width: 0.5, borderColor: AppColor.Shared.red_light)
             
+            
         }
     }
     
+    
+    
     @IBOutlet weak var nameTextField: ProjectDetailsUserTF!
     
+    
+    // PRODUCT LISTING VIEW
+    
+    
+    @IBOutlet weak var productAddStackView: UIStackView!
+    @IBOutlet weak var productListingView: UIView!
+    @IBOutlet weak var productResetButton: UIButton!
+    @IBOutlet weak var productAddButton: UIButton!
+    
+    
+    
+    @IBOutlet weak var productlListingTableView: ProductAddTableView!
+    
+    lazy var productaddList: [MultiProductAddModel] = []{
+        didSet{
+            self.productlListingTableView.reloadData()
+            
+            self.tableHeight.constant = self.productlListingTableView.contentSize.height + CGFloat(productaddList.count * 21)
+
+        }
+    }
+    
+    var clickAddProduct:Bool?{
+        didSet{
+            switch clickAddProduct{
+            case true:
+                
+                self.productAddStackView.showViews(showView: productListingView)
+               
+                
+                
+            default:
+                
+                self.productAddStackView.hideViews(hideView: self.productListingView)
+                
+                
+            }
+        }
+    }
+    
+    @IBOutlet weak var tableHeight: NSLayoutConstraint!
     weak var productDelegate : ProductModelDelegate?
     weak var enquiryDelegate : ProductEnquiryDelegate?
     weak var quantityDelegate : QuantityDelegate?
+    weak var offerPriceDelegate : ProductOfferPriceDelegate?
     
     var modelCode:String = ""
     
@@ -164,6 +237,9 @@ class ProjectProductDetailsTVC: UITableViewCell{
         self.enquiryNoteTextField.addDonButton()
         self.enquiryNoteTextField.delegate = self
         self.subCategoryQtyTextField.delegate = self
+        self.productlListingTableView.dataSource = self
+        self.productlListingTableView.delegate = self
+       
         
     }
 
@@ -172,6 +248,8 @@ class ProjectProductDetailsTVC: UITableViewCell{
 
         // Configure the view for the selected state
     }
+    
+    
     
     
     func productListingButtonAdd(isZeroProject:NSNumber){
@@ -214,6 +292,15 @@ extension ProjectProductDetailsTVC : UITextFieldDelegate {
         modelCode = newString as String
             return newString.length <= 30
             
+        }else if textField == offerPriceTextField{
+            let controller = UIViewController()
+            let result = controller.currencyPricePointFormateMethod(textField, shouldChangeCharactersIn: range, replacementString: string)
+            return result
+        }else if textField == offerPriceTextField || textField == mrpTextField {
+            let vc = UIViewController()
+            let result = vc.currencyPricePointFormateMethod(textField, shouldChangeCharactersIn: range, replacementString: string)
+             
+             return result
         }else{
             
             currentString  = textField.text!  as NSString
@@ -237,5 +324,48 @@ extension ProjectProductDetailsTVC : UITextFieldDelegate {
             quantityDelegate?.maxQuantity(cell: self,qty: textField.text!)
         }
         
+        if textField == offerPriceTextField{
+            offerPriceDelegate?.getOfferPrice(value: textField.text ?? "")
+        }
+        
     }
 }
+
+extension ProjectProductDetailsTVC:UITableViewDataSource,UITableViewDelegate{
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        return self.productaddList.count
+    }
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.shared.leadGenerationProductAddCell) as! LGProductAddTVC
+        
+        let info = self.productaddList[indexPath.item]
+        
+        cell.categoryView.HeaderDetailTF.setTextFieldValue(info.CategoryName)
+        
+        cell.productView.HeaderDetailTF.setTextFieldValue(info.ProductName)
+        
+        cell.priorityView.HeaderDetailTF.setTextFieldValue(info.PriorityName)
+        
+        
+        
+        return cell
+        
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return UITableView.automaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 230
+    }
+    
+   
+}
+
+

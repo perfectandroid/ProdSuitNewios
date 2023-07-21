@@ -28,7 +28,7 @@ class DashboardMenuCVC: UICollectionViewCell {
         label.minimumScaleFactor = 0.75
         label.adjustsFontSizeToFitWidth = true
         label.textAlignment = .justified
-        label.font = AppFonts.Shared.Regular.withSize(10)
+        label.setFontSize(userDevice == .pad ? 15 : 10, font: .regular, autoScale: false)
         label.textColor = AppColor.Shared.colorWhite
         
         return label
@@ -38,8 +38,9 @@ class DashboardMenuCVC: UICollectionViewCell {
     
     func fetchMenuDetails(info:MenuModel,_ notReadCount:Int){
         self.menuImageView.image = info.image
-        self.menuImageView.transform = CGAffineTransform.init(scaleX: 1.15, y: 1.15)
-        self.menuTitle.font = AppFonts.Shared.Medium.withSize(10.55)
+        //self.menuImageView.setBGColor(color: AppColor.Shared.red)
+        self.menuImageView.transform = CGAffineTransform.init(scaleX: CGFloat(1).menuIconSize, y: CGFloat(1).menuIconSize)
+        self.menuTitle.font = AppFonts.Shared.Medium.withSize(userDevice == .pad ? ipadSizeFactor * 10.55 : 10.55)
         if (info.hasNotification == true && info.name == "Notification" && notReadCount > 0){
             notificationLabelConstraintsAdd()
             self.notificationLabel.text = "  \(notReadCount)  "

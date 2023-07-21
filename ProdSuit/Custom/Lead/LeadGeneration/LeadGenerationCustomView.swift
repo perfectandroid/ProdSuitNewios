@@ -7,24 +7,107 @@
 
 import Foundation
 import UIKit
+import JACalendar
 
 protocol LeadDetailsDateDelegate:AnyObject{
     func getDate(date:String)
 }
 
-class LeadDateTextField : UITextField {
+protocol ExpectedDateProtocol:AnyObject{
+    func expectedDateString(date:String)
+}
 
-//override func rightViewRect(forBounds bounds: CGRect) -> CGRect {
-//    let offset = 5
-//    let width  = 20
-//    let height = width
-//    let x = Int(bounds.width) - width - offset
-//    let y = offset
-//    let rightViewBounds = CGRect(x: x, y: y, width: width, height: height)
-//    return rightViewBounds
-//}
+class LeadExpaectedDateTF:UITextField{
+    
+    
+    weak var delegates : ExpectedDateProtocol?
+    var hasInitialDateRepresentation : Bool = false
+    var leadExpectedDateCalenderTheme = JACalendarTheme()
+    var controller:UIViewController?
+    
+    lazy var dateimageView : UIImageView = {
+        
+        let calendarImage:UIImage = #imageLiteral(resourceName: "ic_emi_todate.png")
+        
+        let imageview = UIImageView()
+        imageview.image = calendarImage
+        return imageview 
+    }()
+    
+    lazy var leadCalenderButton : UIButton = {
+        let btn  = UIButton()
+        btn.titleLabel?.setLabelValue("")
+        btn.setBGColor(color: UIColor.clear)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
+    override func awakeFromNib() {
+        
+        self.leftView = dateimageView
+        self.leftViewMode = .always
+        self.font = AppFonts.Shared.Regular.withSize(15)
+        self.textColor = AppColor.Shared.greyText
+        self.text = DateTimeModel.shared.stringDateFromDate(Date())
+            initializeDate()
+    }
+    
+    override func caretRect(for position: UITextPosition) -> CGRect {
+        return CGRect.zero
+    }
+    
+    override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
+        let offset = 8
+        let width = 24
+        let height = width
+        let x = offset
+        let y = (Int(self.frame.height) - height)/2
+        let leftViewBounds = CGRect(x: x, y: y, width: width, height: height)
+        return leftViewBounds
+    }
+    
+    func initializeDate(){
+        
+        self.addSubview(leadCalenderButton)
+        //leadCalenderButton.backgroundColor = AppColor.Shared.red
+        self.leadCalenderButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
+        
+        self.leadCalenderButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 0).isActive = true
+        
+        self.leadCalenderButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+        
+        self.leadCalenderButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
+        
+        leadExpectedDateCalenderTheme.nextMonthImage = UIImage(named: "next")
+        leadExpectedDateCalenderTheme.previousMonthImage = UIImage(named: "back")
+        leadExpectedDateCalenderTheme.selectedDayColor = AppColor.Shared.colorPrimary
+        
+        leadCalenderButton.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .touchDown)
+    
+    }
+    
+    @objc func datePickerValueChanged(_ sender : UIButton) {
+        
+        
+        
+        
+        JACalendar.show(from: controller!, theme: leadExpectedDateCalenderTheme) { date in
+            
+            self.delegates?.expectedDateString(date: DateTimeModel.shared.stringDateFromDate(date))
+            
+        }
+
+    }
+    
+}
+
+class LeadDateTextField : UITextField{
     
     weak var leadDateDelegate : LeadDetailsDateDelegate?
+    
+    var hasInitialDateRepresentation : Bool = false
+    var leadCalenderTheme = JACalendarTheme()
+    var controller:UIViewController?
     
     lazy var dateimageView : UIImageView = {
         
@@ -33,8 +116,18 @@ class LeadDateTextField : UITextField {
         return imageview
     }()
     
+    lazy var leadCalenderButton : UIButton = {
+        let btn  = UIButton()
+        btn.titleLabel?.setLabelValue("")
+        btn.setBGColor(color: UIColor.clear)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
     let calendarImage:UIImage = UIImage(named: "leadcalendar")!
-    let datePickerView = UIDatePicker()
+    
+    
+    
     
     override func awakeFromNib() {
         
@@ -69,34 +162,39 @@ class LeadDateTextField : UITextField {
     }
     
     func initializeDate(){
-        datePickerView.datePickerMode = .date
-        if #available(iOS 13.4, *) {
-            datePickerView.preferredDatePickerStyle = .compact
-        } else {
-            // Fallback on earlier versions
-        }
-        self.inputView = datePickerView
-        datePickerView.addTarget(self, action: #selector(datePickerValueChanged(sender:)), for: .valueChanged)
+        
+        self.addSubview(leadCalenderButton)
+        self.leadCalenderButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
+        
+        self.leadCalenderButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 0).isActive = true
+        
+        self.leadCalenderButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+        
+        self.leadCalenderButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
+        
+        leadCalenderTheme.nextMonthImage = UIImage(named: "next")
+        leadCalenderTheme.previousMonthImage = UIImage(named: "back")
+        leadCalenderTheme.selectedDayColor = AppColor.Shared.colorPrimary
+        
+        leadCalenderButton.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .touchDown)
     
     }
     
-    @objc func datePickerValueChanged(sender:UIDatePicker) {
-
-            let dateFormatter = DateFormatter()
-
-            dateFormatter.dateStyle = DateFormatter.Style.medium
-
-            dateFormatter.timeStyle = DateFormatter.Style.none
-
-           self.text = DateTimeModel.shared.stringDateFromDate(sender.date)
-        self.leadDateDelegate?.getDate(date: DateTimeModel.shared.stringDateFromDate(sender.date))
-           self.resignFirstResponder()
-
+    @objc func datePickerValueChanged(_ sender : UIButton) {
+        
+        
+        
+        
+        JACalendar.show(from: controller!, theme: leadCalenderTheme) { date in
+            
+            self.leadDateDelegate?.getDate(date: DateTimeModel.shared.stringDateFromDate(date))
         }
+
+    }
     
 }
 
-let rightDownImage = UIImage(named: "down")
+let rightDownImage = UIImage(named: "down")!.imageWithColor(color1: AppColor.Shared.coloBlack)
 let searchImage = UIImage(named: "search")
 
 class LeadDetailsNameTextField:UITextField{
@@ -203,7 +301,7 @@ class LeadDetailSourceField:UITextField{
         return imageview
     }()
     
-    let image:UIImage = UIImage(named: "magnet")!
+    let image:UIImage = UIImage(named: "quotation_icon")!
     lazy var leftSideImageView : UIImageView = {
         
         let imageview = UIImageView()
@@ -764,6 +862,7 @@ class LeadCustomerDetailsTF:UITextField{
     lazy var leftSideImageView : UIImageView = {
         
         let imageview = UIImageView()
+        
         imageview.image = image
         return imageview
     }()
@@ -795,7 +894,7 @@ class LeadCustomerDetailsTF:UITextField{
  
     override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
         let offset = 8
-        let width = 15
+        let width = 24
         let height = width
         let x = offset
         let y = (Int(self.frame.height) - height)/2
@@ -844,7 +943,7 @@ class LeadMoreInfoTF:UITextField{
  
     override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
         let offset = 8
-        let width = 15
+        let width = 16
         let height = width
         let x = offset
         let y = (Int(self.frame.height) - height)/2
@@ -924,7 +1023,7 @@ class LeadMoreListingTF:UITextField{
  
     override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
         let offset = 8
-        let width = 15
+        let width = 24
         let height = width
         let x = offset
         let y = (Int(self.frame.height) - height)/2
@@ -1229,6 +1328,129 @@ class ProjectDetailsQtyTF:UITextField{
         
         
         
+    }
+    
+   
+    
+    override public func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if action == #selector(copy(_:)) || action == #selector(paste(_:)) {
+            return false
+        }
+
+        return true
+    }
+ 
+    override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
+        let offset = 8
+        let width = 15
+        let height = width
+        let x = offset
+        let y = (Int(self.frame.height) - height)/2
+        let leftViewBounds = CGRect(x: x, y: y, width: width, height: height)
+        return leftViewBounds
+    }
+    
+    
+    
+}
+
+
+class ProjectDetailsOfferTF:UITextField{
+    
+    let image:UIImage = UIImage(named: "ic_emi_amount")!
+    
+    lazy var leftSideImageView : UIImageView = {
+        
+        let imageview = UIImageView()
+        imageview.image = image
+        return imageview
+    }()
+    
+    
+    
+    override func awakeFromNib() {
+        
+        self.leftView = leftSideImageView
+        self.leftViewMode = .always
+        self.customPlaceholder(color: AppColor.Shared.greyText, text: "Offer price")
+        self.font = AppFonts.Shared.Regular.withSize(15)
+        self.tintColor = AppColor.Shared.greyText
+        self.textColor = AppColor.Shared.greyText
+        self.autocorrectionType = .no
+        self.keyboardType = .decimalPad
+        
+        
+        
+    }
+    
+   
+    
+    override public func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if action == #selector(copy(_:)) || action == #selector(paste(_:)) {
+            return false
+        }
+
+        return true
+    }
+ 
+    override func leftViewRect(forBounds bounds: CGRect) -> CGRect {
+        let offset = 8
+        let width = 15
+        let height = width
+        let x = offset
+        let y = (Int(self.frame.height) - height)/2
+        let leftViewBounds = CGRect(x: x, y: y, width: width, height: height)
+        return leftViewBounds
+    }
+    
+    
+    
+}
+
+class ProjectDetailsMRPTF:UITextField{
+    
+    let image:UIImage = UIImage(named: "rupee")!
+    
+    lazy var leftSideImageView : UIImageView = {
+        
+        let imageview = UIImageView()
+        imageview.image = image
+        return imageview
+    }()
+    
+    var dropDownButton:UIButton = {
+        
+        let button  = UIButton()
+        button.titleLabel?.text = ""
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    
+    
+    override func awakeFromNib() {
+        
+        self.leftView = leftSideImageView
+        self.leftViewMode = .always
+        self.customPlaceholder(color: AppColor.Shared.greyText, text: "MRP")
+        self.font = AppFonts.Shared.Regular.withSize(15)
+        self.tintColor = AppColor.Shared.greyText
+        self.textColor = AppColor.Shared.greyText
+        self.autocorrectionType = .no
+        setUpDropDown()
+        
+        
+    }
+    
+    func setUpDropDown(){
+        self.addSubview(dropDownButton)
+        dropDownButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
+        
+        dropDownButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 0).isActive = true
+        
+        dropDownButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+        
+        dropDownButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
     }
     
    
@@ -1661,6 +1883,8 @@ class ProjectDetailsDateTF : UITextField {
 
 
     weak var date_delegate:ProjectDateDelegate?
+    var ProjctDateCalenderTheme = JACalendarTheme()
+    var controller:UIViewController?
     
     lazy var dateimageView : UIImageView = {
         
@@ -1677,8 +1901,16 @@ class ProjectDetailsDateTF : UITextField {
         }
     }
     
+    lazy var ProjctDateCalenderButton : UIButton = {
+        let btn  = UIButton()
+        btn.titleLabel?.setLabelValue("")
+        btn.setBGColor(color: UIColor.clear)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
     let calendarImage:UIImage = UIImage(named: "leadcalendar")!
-    let datePickerView = UIDatePicker()
+    //let datePickerView = UIDatePicker()
     
     override func awakeFromNib() {
         
@@ -1714,33 +1946,30 @@ class ProjectDetailsDateTF : UITextField {
     }
     
     func initializeDate(dateOnwards:Bool=false){
-        datePickerView.datePickerMode = .date
-        if #available(iOS 13.4, *) {
-            datePickerView.preferredDatePickerStyle = .compact
-        } else {
-            // Fallback on earlier versions
-        }
-        if dateOnwards == true{
-        datePickerView.minimumDate = Date()
-        }
-        datePickerView.tintColor = AppColor.Shared.greyText
-        self.inputView = datePickerView
-        datePickerView.addTarget(self, action: #selector(datePickerValueChanged(sender:)), for: .valueChanged)
+        self.addSubview(ProjctDateCalenderButton)
+        self.ProjctDateCalenderButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 0).isActive = true
+        
+        self.ProjctDateCalenderButton.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: 0).isActive = true
+        
+        self.ProjctDateCalenderButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 0).isActive = true
+        
+        self.ProjctDateCalenderButton.bottomAnchor.constraint(equalTo: self.bottomAnchor, constant: 0).isActive = true
+        
+        ProjctDateCalenderTheme.nextMonthImage = UIImage(named: "next")
+        ProjctDateCalenderTheme.previousMonthImage = UIImage(named: "back")
+        ProjctDateCalenderTheme.selectedDayColor = AppColor.Shared.colorPrimary
+        
+        ProjctDateCalenderButton.addTarget(self, action: #selector(datePickerValueChanged(_:)), for: .touchDown)
     
     }
     
-    @objc func datePickerValueChanged(sender:UIDatePicker) {
+    @objc func datePickerValueChanged(_ sender : UIButton) {
 
-            let dateFormatter = DateFormatter()
-
-            dateFormatter.dateStyle = DateFormatter.Style.medium
-
-            dateFormatter.timeStyle = DateFormatter.Style.none
-
-           self.text = DateTimeModel.shared.stringDateFromDate(sender.date)
-        date_delegate?.projectDate(date: DateTimeModel.shared.stringDateFromDate(sender.date))
-           self.resignFirstResponder()
-
+        JACalendar.show(from: controller!, theme: ProjctDateCalenderTheme) { date in
+            
+            self.setTextFieldValue(DateTimeModel.shared.stringDateFromDate(date))
+            self.date_delegate?.projectDate(date: DateTimeModel.shared.stringDateFromDate(date))
+            }
         }
     
 }

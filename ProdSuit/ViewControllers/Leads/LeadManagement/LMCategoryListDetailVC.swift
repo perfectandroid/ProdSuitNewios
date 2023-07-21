@@ -151,25 +151,33 @@ class LMCategoryListDetailVC: UIViewController,TabLayoutDelegate,CXCallObserverD
         DispatchQueue.main.async {
             page2.leadHistoryAPICall(id_LeadGenerateProduct, id_actionType, self.fk_employee)
         }
-       
+        
         let page3 = AppVC.Shared.lmDetailsLocationPage
         let id_LeadGenerate = "\(info.ID_LeadGenerate)"
+        
         DispatchQueue.main.async {
+            if self.from != "mylead"{
             page3.locationImageAPICall(id_LeadGenerate, id_LeadGenerateProduct, self.fk_employee)
+            }
         }
         
         let page4 = AppVC.Shared.lmDetailsImagePage
         DispatchQueue.main.async {
+            if self.from != "mylead"{
             page4.locationImageAPICall(id_LeadGenerate, id_LeadGenerateProduct, self.fk_employee)
+            }
         }
         
         let page5 = AppVC.Shared.lmDetailsDocumentPage
         DispatchQueue.main.async {
-          
+            if self.from != "mylead"{
             page5.documentAPICall(id_LeadGenerate, id_LeadGenerateProduct)
+            }
             page5.ID_LeadGenerate = id_LeadGenerate
             page5.ID_LeadGenerateProduct = id_LeadGenerateProduct
-        }
+            
+         }
+        
         
         if from != "mylead"{
             tabLayout.addTabs(tabs: [

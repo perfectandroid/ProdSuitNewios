@@ -66,6 +66,7 @@
 		FAA1239929B608B400A184C3 /* CustomDashboardViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA1239829B608B400A184C3 /* CustomDashboardViews.swift */; };
 		FAAA244329B9FBDF00FA0D9F /* SideMenuHeaderTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAAA244229B9FBDF00FA0D9F /* SideMenuHeaderTVC.swift */; };
 		FAAA244529B9FC0D00FA0D9F /* SideMenueContentTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAAA244429B9FC0D00FA0D9F /* SideMenueContentTVC.swift */; };
+		FAC31CA02A67CF6700336B9F /* LGProductAddTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC31C9F2A67CF6700336B9F /* LGProductAddTVC.swift */; };
 		FAC4FC272A2F2E0800D72DDC /* EmiCategoriesListingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC4FC262A2F2E0800D72DDC /* EmiCategoriesListingVC.swift */; };
 		FAC4FC2A2A2F2EFC00D72DDC /* EMICategoriesListingTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC4FC292A2F2EFC00D72DDC /* EMICategoriesListingTVC.swift */; };
 		FAC6A33629B76CCF00F1F1A1 /* DashboardVCViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC6A33529B76CCF00F1F1A1 /* DashboardVCViewModel.swift */; };
@@ -143,6 +144,7 @@
 		FAE92771299B7EC300E6E1CD /* AppFontHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE92770299B7EC300E6E1CD /* AppFontHelper.swift */; };
 		FAE92773299B848600E6E1CD /* AppStoryBoardHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE92772299B848600E6E1CD /* AppStoryBoardHelper.swift */; };
 		FAE92776299B9BD100E6E1CD /* SliderBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE92775299B9BD100E6E1CD /* SliderBottomView.swift */; };
+		FAE95FFF2A52E4270031E472 /* PunchInOutVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE95FFE2A52E4270031E472 /* PunchInOutVC.swift */; };
 		FAEA02B529E90D4D0020EA09 /* ReusableTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEA02B429E90D4D0020EA09 /* ReusableTVC.swift */; };
 		FAEBF93729FA7E4C005DCB45 /* ValidationHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEBF93629FA7E4C005DCB45 /* ValidationHelpers.swift */; };
 		FAEBF93A29FA952E005DCB45 /* MapviewVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAEBF93929FA952E005DCB45 /* MapviewVC.swift */; };
@@ -167,8 +169,12 @@
 		FAF1569029B59E9B005AF5C6 /* SetMpinModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF1568F29B59E9B005AF5C6 /* SetMpinModels.swift */; };
 		FAF1569329B5BDF1005AF5C6 /* MpinVCViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF1569229B5BDF1005AF5C6 /* MpinVCViewModel.swift */; };
 		FAF1B5102A3751BF0057C259 /* WalkingCustomerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF1B50F2A3751BE0057C259 /* WalkingCustomerVC.swift */; };
+		FAF1E7512A541C8300A8E22E /* PunchInOutModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF1E7502A541C8300A8E22E /* PunchInOutModels.swift */; };
 		FAF276542A1F20CB00904111 /* LMDDocumentUploadTVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF276532A1F20CB00904111 /* LMDDocumentUploadTVC.swift */; };
 		FAF3462D2A42C132007C3FDF /* EMICollectionHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF3462C2A42C132007C3FDF /* EMICollectionHelper.swift */; };
+		FAF38DF32A56838600AB65A4 /* PRODSUIT-UAT.cer in Resources */ = {isa = PBXBuildFile; fileRef = FAF38DF22A56838600AB65A4 /* PRODSUIT-UAT.cer */; };
+		FAF38DF42A56838600AB65A4 /* PRODSUIT-UAT.cer in Resources */ = {isa = PBXBuildFile; fileRef = FAF38DF22A56838600AB65A4 /* PRODSUIT-UAT.cer */; };
+		FAF38DF52A56838600AB65A4 /* PRODSUIT-UAT.cer in Resources */ = {isa = PBXBuildFile; fileRef = FAF38DF22A56838600AB65A4 /* PRODSUIT-UAT.cer */; };
 		FAF549E52A15D46700E5843A /* LmListMessageVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF549E32A15D46700E5843A /* LmListMessageVC.swift */; };
 		FAF549E62A15D46700E5843A /* LmListMessageVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = FAF549E42A15D46700E5843A /* LmListMessageVC.xib */; };
 		FAFAB1172A1CC7E80092048A /* LMCDAttachDocVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFAB1162A1CC7E80092048A /* LMCDAttachDocVC.swift */; };
@@ -269,6 +275,7 @@
 		FAA1239829B608B400A184C3 /* CustomDashboardViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomDashboardViews.swift; sourceTree = "<group>"; };
 		FAAA244229B9FBDF00FA0D9F /* SideMenuHeaderTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenuHeaderTVC.swift; sourceTree = "<group>"; };
 		FAAA244429B9FC0D00FA0D9F /* SideMenueContentTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SideMenueContentTVC.swift; sourceTree = "<group>"; };
+		FAC31C9F2A67CF6700336B9F /* LGProductAddTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LGProductAddTVC.swift; sourceTree = "<group>"; };
 		FAC4FC262A2F2E0800D72DDC /* EmiCategoriesListingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmiCategoriesListingVC.swift; sourceTree = "<group>"; };
 		FAC4FC292A2F2EFC00D72DDC /* EMICategoriesListingTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EMICategoriesListingTVC.swift; sourceTree = "<group>"; };
 		FAC6A33529B76CCF00F1F1A1 /* DashboardVCViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardVCViewModel.swift; sourceTree = "<group>"; };
@@ -346,6 +353,7 @@
 		FAE92770299B7EC300E6E1CD /* AppFontHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFontHelper.swift; sourceTree = "<group>"; };
 		FAE92772299B848600E6E1CD /* AppStoryBoardHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoryBoardHelper.swift; sourceTree = "<group>"; };
 		FAE92775299B9BD100E6E1CD /* SliderBottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SliderBottomView.swift; sourceTree = "<group>"; };
+		FAE95FFE2A52E4270031E472 /* PunchInOutVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PunchInOutVC.swift; sourceTree = "<group>"; };
 		FAEA02B429E90D4D0020EA09 /* ReusableTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReusableTVC.swift; sourceTree = "<group>"; };
 		FAEBF93629FA7E4C005DCB45 /* ValidationHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationHelpers.swift; sourceTree = "<group>"; };
 		FAEBF93929FA952E005DCB45 /* MapviewVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapviewVC.swift; sourceTree = "<group>"; };
@@ -370,8 +378,10 @@
 		FAF1568F29B59E9B005AF5C6 /* SetMpinModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetMpinModels.swift; sourceTree = "<group>"; };
 		FAF1569229B5BDF1005AF5C6 /* MpinVCViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MpinVCViewModel.swift; sourceTree = "<group>"; };
 		FAF1B50F2A3751BE0057C259 /* WalkingCustomerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalkingCustomerVC.swift; sourceTree = "<group>"; };
+		FAF1E7502A541C8300A8E22E /* PunchInOutModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PunchInOutModels.swift; sourceTree = "<group>"; };
 		FAF276532A1F20CB00904111 /* LMDDocumentUploadTVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMDDocumentUploadTVC.swift; sourceTree = "<group>"; };
 		FAF3462C2A42C132007C3FDF /* EMICollectionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EMICollectionHelper.swift; sourceTree = "<group>"; };
+		FAF38DF22A56838600AB65A4 /* PRODSUIT-UAT.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PRODSUIT-UAT.cer"; sourceTree = "<group>"; };
 		FAF549E32A15D46700E5843A /* LmListMessageVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LmListMessageVC.swift; sourceTree = "<group>"; };
 		FAF549E42A15D46700E5843A /* LmListMessageVC.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LmListMessageVC.xib; sourceTree = "<group>"; };
 		FAFAB1162A1CC7E80092048A /* LMCDAttachDocVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LMCDAttachDocVC.swift; sourceTree = "<group>"; };
@@ -452,6 +462,7 @@
 		FA06044729A75AB4002A31EF /* certificate */ = {
 			isa = PBXGroup;
 			children = (
+				FAF38DF22A56838600AB65A4 /* PRODSUIT-UAT.cer */,
 				FA06044C29A78F61002A31EF /* STATIC-VM01.cer */,
 			);
 			path = certificate;
@@ -655,6 +666,7 @@
 		FA802741299A02A20049E4D8 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				FAF1E74F2A541C6100A8E22E /* PunchInOut */,
 				FADC7F9D2A3C699400C775CA /* Collection */,
 				FAEFF2602A0A023D00C96E67 /* LeadManagement */,
 				FA1BD51D29E57918003B2603 /* LeadGeneration */,
@@ -1169,6 +1181,7 @@
 				FAE7A7C129DD691C00B98843 /* LocationDetailsTVC.swift */,
 				FAE7A7C329DD694800B98843 /* UploadImageViewTVC.swift */,
 				FAFC7D932A08BD4D00B50F65 /* LeadRequestTVC.swift */,
+				FAC31C9F2A67CF6700336B9F /* LGProductAddTVC.swift */,
 			);
 			path = LeadGeneration;
 			sourceTree = "<group>";
@@ -1184,6 +1197,7 @@
 		FAE6855F29C468A7001CD84F /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				FAE95FFD2A52E3E90031E472 /* PunchInOut */,
 				FAE6905A29D3ECBF004804EC /* Notification */,
 				FAE6905929D3EC9E004804EC /* Reminder */,
 				FAE83D0929D2F7EB00B35964 /* Charts */,
@@ -1337,6 +1351,14 @@
 			path = Login;
 			sourceTree = "<group>";
 		};
+		FAE95FFD2A52E3E90031E472 /* PunchInOut */ = {
+			isa = PBXGroup;
+			children = (
+				FAE95FFE2A52E4270031E472 /* PunchInOutVC.swift */,
+			);
+			path = PunchInOut;
+			sourceTree = "<group>";
+		};
 		FAEA02B329E90D030020EA09 /* Common */ = {
 			isa = PBXGroup;
 			children = (
@@ -1441,6 +1463,14 @@
 				FAF1B50F2A3751BE0057C259 /* WalkingCustomerVC.swift */,
 			);
 			path = WalkingCustomer;
+			sourceTree = "<group>";
+		};
+		FAF1E74F2A541C6100A8E22E /* PunchInOut */ = {
+			isa = PBXGroup;
+			children = (
+				FAF1E7502A541C8300A8E22E /* PunchInOutModels.swift */,
+			);
+			path = PunchInOut;
 			sourceTree = "<group>";
 		};
 		FAF549E12A15D41500E5843A /* xib */ = {
@@ -1636,6 +1666,7 @@
 				FAE92764299B695700E6E1CD /* Poppins-ExtraBoldItalic.ttf in Resources */,
 				FAE9276A299B695700E6E1CD /* Poppins-Bold.ttf in Resources */,
 				FA80271A299A01DD0049E4D8 /* Assets.xcassets in Resources */,
+				FAF38DF32A56838600AB65A4 /* PRODSUIT-UAT.cer in Resources */,
 				FAE92762299B695700E6E1CD /* Poppins-Medium.ttf in Resources */,
 				FA802715299A01DB0049E4D8 /* Main.storyboard in Resources */,
 			);
@@ -1645,6 +1676,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAF38DF42A56838600AB65A4 /* PRODSUIT-UAT.cer in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1652,6 +1684,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAF38DF52A56838600AB65A4 /* PRODSUIT-UAT.cer in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1750,6 +1783,7 @@
 				FAFB0AAA2A4566E200B24833 /* PaymentMethodAddTVC.swift in Sources */,
 				FADD31A329A384AC00B26626 /* StringExtension.swift in Sources */,
 				FAF1B5102A3751BF0057C259 /* WalkingCustomerVC.swift in Sources */,
+				FAF1E7512A541C8300A8E22E /* PunchInOutModels.swift in Sources */,
 				FAEF837D2A284DB8009E7B57 /* SharedNetworkCall.swift in Sources */,
 				FA802751299A38DB0049E4D8 /* FlashAnimationImgView.swift in Sources */,
 				FAE6856629C4694E001CD84F /* ContactUsVC.swift in Sources */,
@@ -1782,8 +1816,10 @@
 				FAE92771299B7EC300E6E1CD /* AppFontHelper.swift in Sources */,
 				FAFC7D972A09223F00B50F65 /* LeadManageMentViewModel.swift in Sources */,
 				FA21AEA129DC3D4E005913FA /* CustomerDetailsTVC3.swift in Sources */,
+				FAC31CA02A67CF6700336B9F /* LGProductAddTVC.swift in Sources */,
 				FAECEAEB2A1737BE00F29C0B /* LMCategoryListDetailVC.swift in Sources */,
 				FA00E2A82A1E3E4A007EBF0A /* LeadManageMentValidationModel.swift in Sources */,
+				FAE95FFF2A52E4270031E472 /* PunchInOutVC.swift in Sources */,
 				FAE6AC7529C98B5F00B04007 /* ChangeMpinVCViewModel.swift in Sources */,
 				FA80270E299A01DA0049E4D8 /* AppDelegate.swift in Sources */,
 				FA06045029A798B7002A31EF /* SplashViewModel.swift in Sources */,
@@ -2043,14 +2079,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U96P2U3ZHU;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ProdSuit/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "This app requires access to the calendar";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "To get location when adding site verification request.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "To get location when adding site verification request.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to the photo library";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "Allow ProdSuit to access calendar";
@@ -2070,11 +2109,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.perfect.ProSuit.ProdSuit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "ProdSuit/ViewControllers/Encryption/ProdSuit-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -2085,14 +2125,17 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = U96P2U3ZHU;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ProdSuit/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "This app requires access to the calendar";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app requires access to the camera";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "To get location when adding site verification request.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "To get location when adding site verification request.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app requires access to the photo library";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "Allow ProdSuit to access calendar";
@@ -2112,10 +2155,11 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.perfect.ProSuit.ProdSuit;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "ProdSuit/ViewControllers/Encryption/ProdSuit-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

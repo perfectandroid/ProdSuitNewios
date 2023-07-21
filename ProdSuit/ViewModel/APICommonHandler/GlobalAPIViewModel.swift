@@ -70,6 +70,8 @@ class GlobalAPIViewModel{
                             message = "Timed out."
                         case "The network connection was lost.":
                             message = "No internet connection"
+                        case "A data connection is not currently allowed.":
+                            message = "No internet connection"
                         case "Could not connect to the server.":
                             message = generalErrorMsg
                         default:
@@ -141,6 +143,8 @@ class GlobalAPIViewModel{
          }
     }
     
+    
+    
     func statusCheck(data:NSDictionary,modelKey:String="",controller:UIViewController,actionHandler:@escaping()->Void){
         
         datas = [:]
@@ -171,6 +175,31 @@ class GlobalAPIViewModel{
     }
     
     
+}
+
+
+class AsyncImageBinder: ObservableObject {
+    private var subscription: AnyCancellable?
+    // 2
+    @Published private(set) var image: UIImage?
+    // 3
+    func load(_ baseUrl:String=APIImageUrl,urlString: String,imgView:UIImageView) {
+        //do something
+        let imageUrlString = "\(baseUrl)/\(urlString)"
+        let url = URL(string: imageUrlString)
+        let session = URLSession.init(configuration: .default, delegate: MySessionDelegate(), delegateQueue: nil)
+        subscription = session.dataTaskPublisher(for: url!)
+                       .map { UIImage(data: $0.data) }
+                       .replaceError(with: nil)          // 3
+                       .receive(on: DispatchQueue.main)
+                       .assign(to: \.image, on: imgView)
+        
+        
+    }
+    // 4
+    func cancel() {
+        subscription?.cancel()
+    }
 }
 
 struct successErrorHandler{

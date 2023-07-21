@@ -8,7 +8,7 @@
 import UIKit
 import Combine
 
-class WalkingCustomerVC: UIViewController {
+class WalkingCustomerVC: UIViewController  {
 
     @IBOutlet weak var customerTF: LSideImageViewTF!{
         didSet{
@@ -43,8 +43,11 @@ class WalkingCustomerVC: UIViewController {
     
     @IBOutlet weak var assignedDateView: TransDateView!{
         didSet{
+            
             assignedDateView.HeaderDetailTF.setBorder(width: 0.6, borderColor: AppColor.Shared.coloBlack)
-            self.assignedDateView.datePickerView.minimumDate = Date()
+            assignedDateView.controller = self
+            
+            //self.assignedDateView.datePickerView.minimumDate = Date()
             assignedDateView.leftSideImageView.image = UIImage.init(named: "icon_emi_duedays")
             assignedDateView.HeaderDetailTF.tintColor = AppColor.Shared.coloBlack
             assignedDateView.HeaderNameLabel.setLabelValue(" Assigned Date *")
@@ -71,11 +74,11 @@ class WalkingCustomerVC: UIViewController {
     var mobileNumber = ""
     
     let commonNetworkLayer = SharedNetworkCall.Shared
-    
+    var punchStatus:Bool = false
     lazy var assignedToList : [EmployeeDetailsListInfo] = []
     
     var selectedAssignedTo:EmployeeDetailsListInfo?
-    
+   
     private var validationVm : WCValidationViewModel = WCValidationViewModel.init(brockenRules: [])
     
     fileprivate func textDescriptionChange() {
@@ -91,6 +94,9 @@ class WalkingCustomerVC: UIViewController {
         keyboardHandler()
         mobileTextDidChange()
         textDescriptionChange()
+        self.punchStatus = preference.User_Status
+        self.attendanchCheck(status: self.punchStatus)
+        
         // Do any additional setup after loading the view.
     }
     
@@ -102,11 +108,28 @@ class WalkingCustomerVC: UIViewController {
         }.store(in: &mobileTextCancellable)
     }
     
+    func attendanchCheck(status:Bool){
+        switch status{
+        case false:
+            let punchPopUpcheckVC = AppVC.Shared.punchPopUpPage
+            punchPopUpcheckVC.status = status
+            punchPopUpcheckVC.fromvc = "walking"
+            punchPopUpcheckVC.attendanceDelegate = self
+            punchPopUpcheckVC.modalTransitionStyle = .crossDissolve
+            punchPopUpcheckVC.modalPresentationStyle = .overCurrentContext
+            self.present(punchPopUpcheckVC, animated: false)
+        default:
+            print("attendance marked")
+        }
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
         defaultFormValue()
         employeeAPICall()
     }
+    
+    
     
     //MARK: - employeeAPICall()
     func employeeAPICall(){
@@ -254,7 +277,12 @@ class WalkingCustomerVC: UIViewController {
         if validationVm.isValid == true{
             print("submit api ")
             
-            self.walkInCustomerUpdatAPICall(vm: validationVm)
+            if self.punchStatus == false{
+                self.attendanchCheck(status: self.punchStatus)
+            }else{
+                self.walkInCustomerUpdatAPICall(vm: validationVm)
+            }
+            
         }
         else{
             self.popupAlert(title: "", message: self.validationVm.brockenRules.first!.message, actionTitles: [okTitle], actions: [{action1 in },nil])
@@ -359,3 +387,15 @@ extension WalkingCustomerVC:UITextViewDelegate{
         
     }
 }
+
+    
+    extension WalkingCustomerVC:AttendanceChangeProtocol{
+        
+        func changeAttendance(status: Bool) {
+            self.punchStatus = status
+            
+            
+        }
+        
+        
+    }

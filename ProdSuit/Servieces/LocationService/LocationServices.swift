@@ -151,7 +151,7 @@ struct LocationFetchViewModel
         let location2D = CLLocationCoordinate2D.init(latitude: latitude, longitude: longitude)
         geoCoder.reverseGeocodeCoordinate(location2D) { response, error in
             if  let addressArray = response?.results() as? [GMSAddress]{
-                print(addressArray)
+               
                 
               
 

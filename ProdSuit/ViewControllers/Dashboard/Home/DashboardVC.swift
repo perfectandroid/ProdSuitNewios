@@ -15,7 +15,9 @@ class DashboardVC: UIViewController {
     @IBOutlet weak var menuBgView: MenuBgView!
     @IBOutlet weak var imageSliderView: ImageSliderView!
     
+    @IBOutlet weak var headerLogoImgView: UIImageView!
     @IBOutlet weak var companyLogImageView: UIImageView!
+    @IBOutlet weak var technologyPartnerImageView:UIImageView!
     @IBOutlet weak var companyLogNameLabel: UILabel!
     @IBOutlet weak var stackBGView: UIView!
     @IBOutlet weak var dashCurveView: PentagonView!
@@ -23,6 +25,43 @@ class DashboardVC: UIViewController {
     
     @IBOutlet weak var quitLabel: UILabel!
     @IBOutlet weak var logoutLabel: UILabel!
+    @IBOutlet weak var punchLabel: UILabel!
+    
+    @IBOutlet weak var punchView: UIView!
+    @IBOutlet weak var tabStackView: UIStackView!
+    @IBOutlet weak var logoutView: UIView!
+    
+    lazy var imageLoader = AsyncImageBinder()
+    
+    
+    var hasAttendce_Marking : Bool = true{
+        didSet{
+            switch hasAttendce_Marking{
+            case true:
+                self.logoutView.subviews.map{ $0.isHidden == true}
+                self.logoutView.isHidden = true
+                
+                self.punchView.subviews.map{ $0.isHidden == false }
+                self.punchView.isHidden = false
+                
+                UIView.animate(withDuration: 0.2) {
+                    self.tabStackView.layoutIfNeeded()
+                }
+            default:
+                self.punchView.subviews.map{ $0.isHidden == true}
+                self.punchView.isHidden = true
+                
+                self.logoutView.subviews.map{ $0.isHidden == false}
+                self.logoutView.isHidden = false
+                
+                UIView.animate(withDuration: 0.2) {
+                    self.tabStackView.layoutIfNeeded()
+                }
+            }
+        }
+    }
+    
+    var punchStatus:Bool = false
     
     
     @IBOutlet weak var stackBgHeightConstriant: NSLayoutConstraint!
@@ -50,8 +89,12 @@ class DashboardVC: UIViewController {
     }
     
     
+    var loginedUser:String = ""{
+        didSet{
+            self.sideMenuTableView.reloadSections(IndexSet.init(integer: 0), with: .none)
+        }
+    }
     
-
     
     
     override func viewDidLoad() {
@@ -60,8 +103,8 @@ class DashboardVC: UIViewController {
         
         menuBgView.isHidden = true
         sideMenuBGView.isHidden = true
-        self.tabbarTitle = ["Reminder","Log out","Quit"]
-        self.tabbarlabelList = [reminderLabel,logoutLabel,quitLabel]
+        self.tabbarTitle = ["Reminder","Log out","Punch","Quit"]
+        self.tabbarlabelList = [reminderLabel,logoutLabel,punchLabel,quitLabel]
         
         self.sidMenuWidthConstraint.constant = self.view.frame.width
         
@@ -72,7 +115,10 @@ class DashboardVC: UIViewController {
         
         
         dashboardVM = DashboardVCViewModel(controller: self)
-        
+        let imageurlString = preference.AppIconImageCode
+        imageLoader.load(urlString: imageurlString, imgView: headerLogoImgView)
+        let technologyPartnerUrlString = preference.CompanyLogoImageCode
+        imageLoader.load(urlString: technologyPartnerUrlString, imgView: technologyPartnerImageView)
         
         loadDashBoardApi()
         
@@ -80,7 +126,8 @@ class DashboardVC: UIViewController {
         tableViewDelegate(tableview:sideMenuTableView)
         collectionViewDelegate(dashBoardVC: self)
         
-       
+        self.punchStatus = preference.User_Status
+        attendanceMarkCheck()
 
         // Do any additional setup after loading the view.
     }
@@ -116,8 +163,27 @@ class DashboardVC: UIViewController {
       
     }
     
+   
+    
+    fileprivate func attendanceMarkCheck() {
+        switch self.punchStatus{
+        case false:
+            let punchPopUpcheckVC = AppVC.Shared.punchPopUpPage
+            punchPopUpcheckVC.status = punchStatus
+            punchPopUpcheckVC.fromvc = "dashboard"
+            punchPopUpcheckVC.attendanceDelegate = self
+            punchPopUpcheckVC.modalTransitionStyle = .crossDissolve
+            punchPopUpcheckVC.modalPresentationStyle = .overCurrentContext
+            self.present(punchPopUpcheckVC, animated: false)
+        default:
+            print("attendance marked")
+        }
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.hasAttendce_Marking = preference.User_module_ATTANCE_MARKING
+        self.loginedUser = preference.User_UserName
         
         self.navigationController?.viewControllers.removeAll(where: { (vc) -> Bool in
             return vc.isKind(of: DashboardVC.self) ? false : true
@@ -210,6 +276,7 @@ class DashboardVC: UIViewController {
     deinit {
         
         self.imageSliderView.stop()
+        self.imageLoader.cancel()
     
         self.dashboardVM = DashboardVCViewModel(controller: self)
         
@@ -255,6 +322,8 @@ class DashboardVC: UIViewController {
             self.present(reminderPopUPVC, animated: true)
             
         case 1:
+            
+            
             self.popupAlert(title: "Log Out", message: logoutMessage, actionTitles: [no_cancel_title,yesTitle], actions: [{ action1 in
                 print("no")
                 self.resetTabbar()
@@ -265,6 +334,15 @@ class DashboardVC: UIViewController {
                 self.preference.logOut()
             },nil])
         case 2:
+            
+            let punchPopUpcheckVC = AppVC.Shared.punchPopUpPage
+            punchPopUpcheckVC.status = punchStatus
+            punchPopUpcheckVC.fromvc = ""
+            punchPopUpcheckVC.attendanceDelegate = self
+            punchPopUpcheckVC.modalTransitionStyle = .crossDissolve
+            punchPopUpcheckVC.modalPresentationStyle = .overCurrentContext
+            self.present(punchPopUpcheckVC, animated: false)
+        case 3:
             self.popupAlert(title: "Quit", message: quitMessage, actionTitles: [no_cancel_title,yesTitle], actions: [{ action1 in
                 print("no")
                 print(self.navigationController?.viewControllers)
@@ -454,7 +532,7 @@ extension DashboardVC : UITableViewDelegate,UITableViewDataSource{
         case 0:
             let cell = tableView.dequeueReusableCell(withIdentifier: "sideMenuHeaderTVC") as! SideMenuHeaderTVC
             //cell.contentView.backgroundColor = AppColor.Shared.colorWhite
-            cell.configureCellDetails()
+            cell.configureCellDetails(userName: loginedUser)
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: "sideMenueContentTVC") as! SideMenueContentTVC
@@ -553,4 +631,14 @@ extension DashboardVC:ChangeMPINProtocol{
         
     }
   
+}
+
+extension DashboardVC:AttendanceChangeProtocol{
+    func changeAttendance(status: Bool) {
+        self.punchStatus = status
+        
+        self.resetTabbar()
+    }
+    
+    
 }

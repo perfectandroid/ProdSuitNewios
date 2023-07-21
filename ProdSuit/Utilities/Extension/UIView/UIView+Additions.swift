@@ -42,6 +42,32 @@ extension UIView{
         self.backgroundColor = color
     }
     
+    func hideViews(hideView:UIView){
+        
+        hideView.subviews.map{ $0.isHidden = true }
+        hideView.isHidden = true
+        
+        
+        
+        UIView.animate(withDuration: 0.1, delay: 0) {
+          
+            self.layoutIfNeeded()
+        }
+    }
+    
+    func showViews(showView:UIView){
+        
+        showView.subviews.map{ $0.isHidden = false }
+        showView.isHidden = false
+        
+        
+        
+        UIView.animate(withDuration: 0.1, delay: 0) {
+            showView.layoutIfNeeded()
+            self.layoutIfNeeded()
+        }
+    }
+    
     func setCornerRadius(size:CGFloat=5){
         self.layer.cornerRadius = size
         self.layer.masksToBounds = false
@@ -196,6 +222,25 @@ extension UIView{
         }
   
     
+}
+
+
+extension UIButton{
+    func leftImage(image: UIImage, renderMode: UIImage.RenderingMode) {
+          self.setImage(image.withRenderingMode(renderMode), for: .normal)
+          self.imageEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+          self.titleEdgeInsets.left = (self.frame.width/2) - (self.titleLabel?.frame.width ?? 0) + 5
+          self.contentHorizontalAlignment = .left
+        
+          self.imageView?.contentMode = .scaleAspectFit
+      }
+       
+    func rightImage(image: UIImage, renderMode: UIImage.RenderingMode){
+           self.setImage(image.withRenderingMode(renderMode), for: .normal)
+           self.imageEdgeInsets = UIEdgeInsets(top: 0, left:image.size.width / 2, bottom: 0, right: 0)
+           self.contentHorizontalAlignment = .right
+           self.imageView?.contentMode = .scaleAspectFit
+       }
 }
 
 

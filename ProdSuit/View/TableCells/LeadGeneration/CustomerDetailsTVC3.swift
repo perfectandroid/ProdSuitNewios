@@ -15,13 +15,34 @@ class CustomerDetailsTVC3: UITableViewCell,UITextFieldDelegate {
     
     
     weak var custmerInfoDelegate: CustomerDetailsProtocol?
-    @IBOutlet weak var emailTF: LeadCustomerDetailsTF!
-    @IBOutlet weak var companyTF: LeadCustomerDetailsTF!
-    @IBOutlet weak var whatsAppNumberTF: LeadCustomerDetailsTF!
-    @IBOutlet weak var contactNumberTF: LeadCustomerDetailsTF!
+    @IBOutlet weak var emailTF: LeadCustomerDetailsTF!{
+        didSet{
+            emailTF.leftSideImageView.image = UIImage(named: "lead_emails")
+        }
+    }
+    @IBOutlet weak var companyTF: LeadCustomerDetailsTF!{
+        didSet{
+            companyTF.leftSideImageView.image = UIImage(named: "icon_svg_company")
+        }
+    }
+    @IBOutlet weak var whatsAppNumberTF: LeadCustomerDetailsTF!{
+        didSet{
+            whatsAppNumberTF.leftSideImageView.image = UIImage(named: "lead_whatsapp")
+        }
+    }
+    @IBOutlet weak var contactNumberTF: LeadCustomerDetailsTF!{
+        didSet{
+            contactNumberTF.leftSideImageView.image = UIImage(named: "lead_landlines")
+            
+        }
+    }
     @IBOutlet weak var customerNameTF: LeadCustomerDetailsTF!{
         didSet{
             
+          
+                customerNameTF.leftSideImageView.image = UIImage(named: "ic_person 1")
+                
+        
             customerNameTF.setBorder(width: 0.5, borderColor: AppColor.Shared.red_light)
             customerNameTF.addDonButton()
             

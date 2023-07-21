@@ -50,6 +50,56 @@ extension LoginValidationModel{
     
 }
 
+struct MultiProductAddValidation:CommonValidateVM{
+    var brockenRules: [BrockenRule]
+    
+    var isValid: Bool{
+        mutating get{
+            self.brockenRules = [BrockenRule]()
+            self.validate()
+            return self.brockenRules.count > 0 ? false : true
+        }
+    }
+    
+    var categoryString : String = ""
+    var priorityString : String = ""
+    var enquiry : String = ""
+    var actionType : String = ""
+    var subActionType : String = ""
+    var project_dateString : String = ""
+}
+
+extension MultiProductAddValidation{
+    mutating private func validate(){
+        if categoryString == ""{
+            
+            self.brockenRules.append(BrockenRule(propertyName: "Category", message: "Select Category"))
+            
+        }else if enquiry == ""{
+            
+            self.brockenRules.append(BrockenRule(propertyName: "enquiry", message: "Add enquiry note"))
+            
+        }else if actionType == ""{
+            
+            self.brockenRules.append(BrockenRule(propertyName: "action", message: "Select Action"))
+            
+        }else if subActionType == "" && self.actionType == "1"{
+            
+            self.brockenRules.append(BrockenRule(propertyName: "action_type", message: "Select Action Type"))
+            
+        }else if project_dateString == "" && self.actionType == "1"{
+            
+            self.brockenRules.append(BrockenRule(propertyName: "project_date", message: "Select follow up date"))
+            
+        }else if priorityString == ""{
+            
+            self.brockenRules.append(BrockenRule(propertyName: "Priority", message: "Select Priority"))
+            
+        }
+    }
+
+}
+
 struct LeadGenerationValidationModel:LoginValidateVM{
     
     var leadDateString:String = ""

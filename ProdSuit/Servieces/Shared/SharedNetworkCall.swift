@@ -16,6 +16,31 @@ protocol SharedNetworkApiDelegate:AnyObject {
     
 }
 
+protocol GeneralSettingAPIProtocol:AnyObject{
+    func getGeneralSettingsAPICall(commonNetworkVM:SharedNetworkCall,_ completionHandler:@escaping(Bool)->Void)
+}
+
+extension GeneralSettingAPIProtocol where Self:UIViewController{
+    func getGeneralSettingsAPICall(commonNetworkVM:SharedNetworkCall,_  completionHandler:@escaping(Bool)->Void){
+        commonNetworkVM.leadMangeAPIManager?.getGeneralSettingsAPICall(completionHandler: { responseHandler in
+        
+            let statusCode = responseHandler.statusCode
+            
+            var gsValue = false
+            let info = responseHandler.info
+            
+            if statusCode == 0{
+                gsValue = info.value(forKey: "GsValue") as? Bool ?? false
+                completionHandler(gsValue)
+            }else{
+                completionHandler(false)
+            }
+           
+        })
+    }
+    
+}
+
 class SharedNetworkCall:SharedNetworkApiDelegate{
     
     lazy var viewModelVc : UIViewController = {
@@ -28,10 +53,12 @@ class SharedNetworkCall:SharedNetworkApiDelegate{
     var parserVm: GlobalAPIViewModel!
     var collectionAPIManager:CollectionAPIManager?
     var leadMangeAPIManager:LMAPIManager?
+    var attendanceAPIManager:AttendanceMarkingAPIManager?
+    var leadGenerationAPIManager:LGAPIManager?
     
     
    
-    
+ 
     
     static var Shared = SharedNetworkCall()
     
@@ -41,8 +68,10 @@ class SharedNetworkCall:SharedNetworkApiDelegate{
         apiParserVm = APIParserManager()
         parserVm = GlobalAPIViewModel(bgView: viewModelVc.view)
         
+        self.attendanceAPIManager = AttendanceMarkingAPIManager()
         self.collectionAPIManager = CollectionAPIManager()
         self.leadMangeAPIManager = LMAPIManager()
+        self.leadGenerationAPIManager = LGAPIManager()
     }
     
    
@@ -54,6 +83,8 @@ class SharedNetworkCall:SharedNetworkApiDelegate{
     
     //================ 
 }
+
+
 
 
 class LMAPIManager:SharedNetworkApiDelegate{
@@ -76,6 +107,8 @@ class LMAPIManager:SharedNetworkApiDelegate{
     lazy var departmentCancellable = Set<AnyCancellable>()
     lazy var saveDataCancellable = Set<AnyCancellable>()
     
+    lazy var lmpiManagerCancellable = Set<AnyCancellable>()
+    
     
     init(){
         apiParserVm = APIParserManager()
@@ -93,13 +126,18 @@ class LMAPIManager:SharedNetworkApiDelegate{
           let lgActMode = actionType
           let iD_FollowUpBy = info.followUPby
           let actStatus = "\(info.statusId)"
-          let trnsDate = DateTimeModel.shared.formattedDateFromString(dateString: info.date)
+       
+          let trnsDate = info.date
+        
           let customerNote  = info.customerRemark
         
           let employeeNote = info.employeeRemark
           let fK_Action = info.nextActionID
           let fK_ActionType = info.nextActionTypeID
-          let nextActionDate = DateTimeModel.shared.formattedDateFromString(dateString: info.nextActionFollowUpdate)
+        
+        let nextActionDate = info.nextActionFollowUpdate == "" ? "" : DateTimeModel.shared.formattedDateFromString(dateString: info.nextActionFollowUpdate , withFormat: "yyyy-MM-dd")!
+            
+    
           let fK_Priority = info.nextActionPriorityID
          
         
@@ -284,7 +322,7 @@ class LMAPIManager:SharedNetworkApiDelegate{
         let fK_Employee = "\(preference.User_Fk_Employee)"
         let entrBy = preference.User_UserCode
         let fk_branchCodeUser = "\(preference.User_FK_BranchCodeUser)"
-        let formattedDate = DateTimeModel.shared.formattedDateFromString(dateString: date)
+        let formattedDate = date
         
         
         if let ebankKey = instanceOfEncryptionPost.encryptUseDES(bankKey, key: SKey),
@@ -480,6 +518,119 @@ class LMAPIManager:SharedNetworkApiDelegate{
         
     }
     
+    //MARK: - commonAPIServiecCall()
+    func commonAPIServiecCall(path:String,arguments:[String:String],showActivityIndicator:Bool=true,modelInfoKey:String="",_ completionHandler:@escaping ((successErrorHandler) -> Void)){
+        let request = apiParserVm.request(urlPath: path,arguMents: arguments)
+        self.parserVm.modelInfoKey = modelInfoKey
+        if showActivityIndicator == true{
+        self.parserVm.progressBar.showIndicator()
+        }
+        self.parserVm.parseApiRequest(request)
+        self.parserVm.$responseHandler
+            .dropFirst()
+            .sink { responseHandler in
+            if showActivityIndicator == true{
+                self.parserVm.progressBar.hideIndicator()
+            }
+            completionHandler(responseHandler)
+            self.lmpiManagerCancellable.dispose()
+        }.store(in: &lmpiManagerCancellable)
+    }
+    
+    func getGeneralSettingsAPICall(completionHandler:@escaping ((successErrorHandler) -> Void)){
+        
+        let Name = "LFLR"
+        let requestMode = RequestMode.shared.generalSettings
+        let apiPath = URLPathList.Shared.getGeneralSettings
+        
+        if let erequestMode = instanceOfEncryptionPost.encryptUseDES(requestMode, key: SKey),
+           let ebankKey = instanceOfEncryptionPost.encryptUseDES(bankKey, key: SKey),
+           
+            let etoken = instanceOfEncryptionPost.encryptUseDES(token, key: SKey),
+           let eName = instanceOfEncryptionPost.encryptUseDES(Name, key: SKey),
+           let efk_company = instanceOfEncryptionPost.encryptUseDES(fk_company, key: SKey){
+            
+            let arguMents = ["ReqMode":erequestMode,"BankKey":ebankKey,"Token":etoken,"FK_Company":efk_company,"Name":eName]
+            self.commonAPIServiecCall(path: apiPath, arguments: arguMents, showActivityIndicator: false, modelInfoKey: "GenralSettingsDetails") { responseHandler in
+                completionHandler(responseHandler)
+           
+            }}
+    }
+    
+}
+
+class AttendanceMarkingAPIManager:SharedNetworkApiDelegate{
+    lazy var viewModelVc : UIViewController = {
+       let vc = UIViewController()
+        return vc
+    }()
+    
+    
+    var apiParserVm: APIParserManager!
+
+    var parserVm: GlobalAPIViewModel!
+    
+    lazy var attendanceCancellable = Set<AnyCancellable>()
+    
+    init(){
+        apiParserVm = APIParserManager()
+        parserVm = GlobalAPIViewModel(bgView: viewModelVc.view)
+    }
+    
+    //MARK: - commonAPIServiecCall()
+    func commonAPIServiecCall(path:String,arguments:[String:String],showActivityIndicator:Bool=true,modelInfoKey:String="",_ completionHandler:@escaping ((successErrorHandler) -> Void)){
+        let request = apiParserVm.request(urlPath: path,arguMents: arguments)
+        self.parserVm.modelInfoKey = modelInfoKey
+        if showActivityIndicator == true{
+        self.parserVm.progressBar.showIndicator()
+        }
+        self.parserVm.parseApiRequest(request)
+        self.parserVm.$responseHandler
+            .dropFirst()
+            .sink { responseHandler in
+            if showActivityIndicator == true{
+                self.parserVm.progressBar.hideIndicator()
+            }
+            completionHandler(responseHandler)
+            self.attendanceCancellable.dispose()
+        }.store(in: &attendanceCancellable)
+    }
+    
+    //MARK: - attendanceMarkingAPICall()
+    func attendanceMarkingAPICall(dateTime:(date:String,time:String),lat:String,lon:String,status:Bool,_ info:PunchedUserDetailsModel,_ completionHandler:@escaping ((successErrorHandler) -> Void)){
+      
+        
+        let apiPath = URLPathList.Shared.updateAttendanceMarking
+        let getStatus = status == true ? "0" : "1"
+        
+        let location_date = DateTimeModel.shared.formattedDateFromString(dateString: dateTime.date)
+        
+        if let ebankKey = instanceOfEncryptionPost.encryptUseDES(bankKey, key: SKey),
+           let etoken = instanceOfEncryptionPost.encryptUseDES(token, key: SKey),
+           let efk_company = instanceOfEncryptionPost.encryptUseDES(fk_company, key: SKey),
+           let eentryBy = instanceOfEncryptionPost.encryptUseDES(entrBy, key: SKey),
+           let efk_employee = instanceOfEncryptionPost.encryptUseDES(fk_employee, key: SKey),
+           let eLocLatitude = instanceOfEncryptionPost.encryptUseDES(lat, key: SKey),
+           let eLocLongitude = instanceOfEncryptionPost.encryptUseDES(lon, key: SKey),
+           let eAddress = instanceOfEncryptionPost.encryptUseDES(punch_address, key: SKey),
+           let eDate = instanceOfEncryptionPost.encryptUseDES(location_date, key: SKey),
+           let etime = instanceOfEncryptionPost.encryptUseDES(dateTime.time, key: SKey),
+           let eStatus = instanceOfEncryptionPost.encryptUseDES(getStatus, key: SKey){
+            
+        
+            
+            let arguments = ["BankKey":ebankKey,"Token":etoken,"EntrBy":eentryBy,"FK_Company":efk_company,"FK_Employee":efk_employee,"LocLatitude":eLocLatitude,"LocLongitude":eLocLongitude,"LocationAddress":eAddress,"LocationEnteredDate":eDate,"LocationEnteredTime":etime,"Status":eStatus]
+            self.commonAPIServiecCall(path: apiPath, arguments: arguments, showActivityIndicator: true, modelInfoKey: "UpdateAttanceMarkingDetails") { responseHandler in
+                preference.User_loc_LocLocationName = punch_address
+                preference.User_EnteredDate = dateTime.date
+                preference.User_EnteredTime = dateTime.time
+                
+                preference.User_loc_LocLattitude = lat
+                preference.User_loc_LocLongitude = lon
+                completionHandler(responseHandler)
+            }
+        }
+    }
 }
 
 
@@ -787,6 +938,75 @@ class CollectionAPIManager:SharedNetworkApiDelegate{
             self.commonAPIServiecCall(path: apiPath, arguments: arguments, showActivityIndicator: true, modelInfoKey: "UpdateEMICollection") { responseHandler in
                 completionHandler(responseHandler)
         }}
+        
+    }
+    
+    
+    
+}
+
+
+class LGAPIManager:SharedNetworkApiDelegate{
+    
+    
+    lazy var viewModelVc : UIViewController = {
+       let vc = UIViewController()
+        return vc
+    }()
+    
+    var apiParserVm: APIParserManager!
+
+    var parserVm: GlobalAPIViewModel!
+    
+    lazy var LGAPICancellable = Set<AnyCancellable>()
+    
+    
+    init(){
+        
+        apiParserVm = APIParserManager()
+        parserVm = GlobalAPIViewModel(bgView: viewModelVc.view)
+        
+    }
+    
+    
+    //MARK: - commonAPIServiecCall()
+    func commonAPIServiecCall(path:String,arguments:[String:String],showActivityIndicator:Bool=true,modelInfoKey:String="",_ completionHandler:@escaping ((successErrorHandler) -> Void)){
+        let request = apiParserVm.request(urlPath: path,arguMents: arguments)
+        self.parserVm.modelInfoKey = modelInfoKey
+        if showActivityIndicator == true{
+        self.parserVm.progressBar.showIndicator()
+        }
+        self.parserVm.parseApiRequest(request)
+        self.parserVm.$responseHandler
+            .dropFirst()
+            .sink { responseHandler in
+            if showActivityIndicator == true{
+                self.parserVm.progressBar.hideIndicator()
+            }
+            completionHandler(responseHandler)
+            self.LGAPICancellable.dispose()
+        }.store(in: &LGAPICancellable)
+    }
+    
+   
+    //MARK: - barcodeSearchAPIInfo()
+    func barcodeSearchAPIInfo(_ barcode:String,modelKey:String="",_ completionHandler:@escaping ((successErrorHandler) -> Void)){
+        
+        let apiPath = URLPathList.Shared.barcodeSearch
+        
+        
+        if let ebankKey = instanceOfEncryptionPost.encryptUseDES(bankKey, key: SKey),
+           let etoken = instanceOfEncryptionPost.encryptUseDES(token, key: SKey),
+           let efkCompany = instanceOfEncryptionPost.encryptUseDES(fk_company, key: SKey),
+           let ename = instanceOfEncryptionPost.encryptUseDES(barcode, key: SKey){
+            
+            let arguMents = ["BankKey":ebankKey,"Token":etoken,"FK_Company":efkCompany,"Name":ename]
+            
+            self.commonAPIServiecCall(path: apiPath,arguments: arguMents,modelInfoKey: modelKey) { responseHandler in
+                  completionHandler(responseHandler)
+            }
+            
+        }
         
     }
     

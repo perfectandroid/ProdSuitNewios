@@ -7,11 +7,14 @@
 
 import Foundation
 import UIKit
+import JACalendar
+
+
 
 
 class EmiInfomationView:UIView{
     
-    
+   
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
@@ -139,10 +142,48 @@ class TableHeaderView:UIView{
     
 }
 
-class TransDateView:UIView{
+
+protocol DateSelectorProtocol:AnyObject{
+    
+  
+    
+    func initializeDatePicker(textField:UITextField,theme:JACalendarTheme,hasInitialDateRepresentation:Bool)
+    func selectCalenderDateAction(controller:UIViewController,theme:JACalendarTheme,textField:UITextField)
+    
+}
+
+extension DateSelectorProtocol where Self:UIView{
+    
+    func initializeDatePicker(textField:UITextField,theme:JACalendarTheme,hasInitialDateRepresentation:Bool){
+        
+        
+        if hasInitialDateRepresentation == true{
+            textField.setTextFieldValue(currentDateString)
+        }
+        var selectedTheme = theme
+        selectedTheme.nextMonthImage = UIImage(named: "next")
+        selectedTheme.previousMonthImage = UIImage(named: "back")
+        selectedTheme.selectedDayColor = AppColor.Shared.colorPrimary
+        
+    }
+    
+    
+    func selectCalenderDateAction(controller:UIViewController,theme:JACalendarTheme,textField:UITextField){
+        JACalendar.show(from: controller, theme: theme) { (date) in
+            textField.setTextFieldValue(DateTimeModel.shared.stringDateFromDate(date))
+       }
+    }
+    
+}
+
+
+class TransDateView:UIView,DateSelectorProtocol{
     
     var titleName:String=""
-    var datePickerView = UIDatePicker()
+    var hasInitialDateRepresentation : Bool = false
+    var jaCalender = JACalendarTheme()
+    var controller:UIViewController?
+    
     
     lazy var leftSideImageView:UIImageView={
         let imgView = UIImageView(frame: CGRect(x: 0, y: 0, width: 24, height: 24))
@@ -157,6 +198,14 @@ class TransDateView:UIView{
             
             return containerView
         }()
+    
+    lazy var transButton : UIButton = {
+        let btn  = UIButton()
+        btn.titleLabel?.setLabelValue("")
+        btn.setBGColor(color: UIColor.clear)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
     
     
     lazy var HeaderNameLabel:UILabel={
@@ -198,8 +247,16 @@ class TransDateView:UIView{
         self.HeaderDetailTF.leftViewMode = .always
         leftSideView.addSubview(leftSideImageView)
         leftSideImageView.center = leftSideView.center
+        
+        
         initialzeDatePicker()
     }
+    
+   
+
+   
+
+    
     
     
     override init(frame: CGRect) {
@@ -213,33 +270,38 @@ class TransDateView:UIView{
     }
     
     func initialzeDatePicker(){
-        datePickerView.datePickerMode = .date
-        datePickerView.tag = 0
+       
+        self.HeaderDetailTF.addSubview(transButton)
+        self.transButton.leadingAnchor.constraint(equalTo: self.HeaderDetailTF.leadingAnchor, constant: 0).isActive = true
         
-        if #available(iOS 13.4, *) {
-            datePickerView.preferredDatePickerStyle = .compact
-        } else {
-            // Fallback on earlier versions
-        }
+        self.transButton.trailingAnchor.constraint(equalTo: self.HeaderDetailTF.trailingAnchor, constant: 0).isActive = true
         
-        HeaderDetailTF.inputView = datePickerView
+        self.transButton.topAnchor.constraint(equalTo: self.HeaderDetailTF.topAnchor, constant: 0).isActive = true
         
-        datePickerView.addTarget(self, action: #selector(datePickerValueChanged(sender:)), for: .valueChanged)
+        self.transButton.bottomAnchor.constraint(equalTo: self.HeaderDetailTF.bottomAnchor, constant: 0).isActive = true
+        
+        HeaderDetailTF.inputView = UIView()
+        HeaderDetailTF.tintColor = UIColor.clear
+        
+        
+       
+        self.initializeDatePicker(textField: HeaderDetailTF, theme: jaCalender, hasInitialDateRepresentation: hasInitialDateRepresentation)
+        
+        
+       
+       
+        
+        transButton.addTarget(self, action: #selector(myTargetFunction(_:)), for: .touchDown)
+        
+    
     }
     
-    @objc func datePickerValueChanged(sender:UIDatePicker) {
-
-             let dateFormatter = DateFormatter()
-
-             dateFormatter.dateStyle = DateFormatter.Style.medium
-
-             dateFormatter.timeStyle = DateFormatter.Style.none
-
-        self.HeaderDetailTF.text = DateTimeModel.shared.stringDateFromDate(sender.date)
-            self.HeaderDetailTF.resignFirstResponder()
-            
-
-        }
+    @objc func myTargetFunction(_ sender : UIButton) {
+        print("myTargetFunction")
+        self.selectCalenderDateAction(controller: controller!, theme: jaCalender, textField: HeaderDetailTF)
+    }
+    
+  
     
     
     
@@ -619,6 +681,13 @@ class ClearButton:UIButton{
 class WhiteTintColorImageView:UIImageView{
     override func awakeFromNib() {
       let image =  self.image?.imageWithColor(color1: AppColor.Shared.colorWhite)
+        self.image = image
+    }
+}
+
+class BlackTintColorImageView:UIImageView{
+    override func awakeFromNib() {
+      let image =  self.image?.imageWithColor(color1: AppColor.Shared.coloBlack)
         self.image = image
     }
 }

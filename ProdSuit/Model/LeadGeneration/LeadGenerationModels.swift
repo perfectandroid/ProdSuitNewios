@@ -535,6 +535,7 @@ struct SelectedProductDetailsInfo{
     var ID_Product : NSNumber?
     var ProductName : String?
     var quantity : String?
+    
     var ProductCode : NSNumber?
     var PriorityName : String?
     var ID_Priority : NSNumber?
@@ -550,8 +551,45 @@ struct SelectedProductDetailsInfo{
     var EmpName : String?
     var DepartmentName : String?
     var DesignationName : String?
+    var ProdShortName : String?
+    var MRP : String = ""
+    var Price : String = ""
+    var expectedDateString : String = DateTimeModel.shared.stringDateFromDate(Date())
     
 }
+
+struct MultiProductAddModel{
+    
+    var Project : String
+    var CategoryName : String
+    var ID_Category : String
+    var ModelString : String
+    var ID_Product : String
+    var ProductName : String
+    var quantity : String
+    
+    var ProductCode : String
+    var PriorityName : String
+    var ID_Priority : String
+    var EnquiryText : String
+    var Status : String
+    var ID_NextAction : String
+    var NxtActnName : String
+    var ID_ActionType : String
+    var ActnTypeName : String
+    var ActionMode : String
+    var date:String
+    var ProdShortName : String
+    var MRP : String = ""
+    var Price : String = ""
+    var expectedDateString : String = ""
+    var ID_Employee : String
+    var EmpName : String
+    var DepartmentName : String
+    var DesignationName : String
+}
+
+
 
 
 struct LeadConfirmationDetails{
@@ -567,3 +605,39 @@ struct LeadConfirmDataRow{
 }
 
 
+struct ItemSearchDataInfoModel{
+    
+    var ID_Product : String
+    var ProductName : String
+    var ProdShortName : String
+    var MRP : String
+    var Price : String
+    var FK_Category : String
+    var CategoryName : String
+    var Project : String
+    
+
+    
+    init(datas:NSDictionary){
+        
+        self.ID_Product = datas.valueParse(key: "ID_Product", optionValue: "")
+        self.ProductName = datas.valueParse(key: "ProductName", optionValue: "")
+        self.ProdShortName = datas.valueParse(key: "ProdShortName", optionValue: "")
+        self.MRP = datas.valueParse(key: "MRP", optionValue: "0.00")
+        self.Price = datas.valueParse(key: "Price", optionValue: "0.00")
+        self.FK_Category = datas.valueParse(key: "FK_Category", optionValue: "")
+        self.CategoryName = datas.valueParse(key: "CategoryName", optionValue: "")
+        self.Project = datas.valueParse(key: "Project", optionValue: "")
+        
+    }
+}
+
+
+
+
+
+extension NSDictionary{
+    func valueParse<T>(key:String,optionValue:T)->T{
+        return self.value(forKey: key) as? T ?? optionValue
+    }
+}

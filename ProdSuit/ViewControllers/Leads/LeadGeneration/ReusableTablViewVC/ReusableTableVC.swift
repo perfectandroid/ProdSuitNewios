@@ -152,8 +152,25 @@ class ReusableTableVC<Element:HasValue,Cell:UITableViewCell,table:UITableView>: 
         let topStackView = UIStackView(arrangedSubviews: [topLabel,searchTextFields])
         topStackView.axis = .vertical
         
+        let backButton = BackButtonCC()
+        
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        
+        topStackView.addSubview(backButton)
+        topStackView.bringSubviewToFront(backButton)
+        
         topView.addSubview(topStackView)
+        
+        backButton.leadingAnchor.constraint(equalTo: topLabel.leadingAnchor, constant: -10).isActive = true
+        backButton.topAnchor.constraint(equalTo: topLabel.topAnchor, constant: 0).isActive = true
+        backButton.bottomAnchor.constraint(equalTo: topLabel.bottomAnchor, constant: 0).isActive = true
+        backButton.images = UIImage(named: "profileBackArrow")
+        backButton.imageView?.layer.transform = CATransform3DMakeScale(0.6, 0.6, 0.6)
+        backButton.widthAnchor.constraint(equalToConstant: 45).isActive = true
+        backButton.addTarget(self, action: #selector(backButtonAction(_:)), for: .touchUpInside)
         topLabel.text = listingTitleString
+        
         topStackView.spacing = 10
         topStackView.distribution = .fillEqually
         
@@ -162,6 +179,10 @@ class ReusableTableVC<Element:HasValue,Cell:UITableViewCell,table:UITableView>: 
         
         return topView
        }
+    
+    @objc func backButtonAction(_ sender : UIButton){
+        self.dismiss(animated: true)
+    }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         

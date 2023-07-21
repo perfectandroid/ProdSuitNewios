@@ -49,7 +49,7 @@ class LMCDAttachDocVC: UIViewController,LMCDDocUploadDateDelegate {
     }
     @IBOutlet weak var dateTF: LMCDDocUploadDateTF!{
         didSet{
-          
+            self.dateTF.controller = self
             self.dateTF.docDateDeleagate = self
         }
     }
@@ -74,6 +74,9 @@ class LMCDAttachDocVC: UIViewController,LMCDDocUploadDateDelegate {
     var dataString:String = ""
     var dataFormate:String = ""
     var dataFileName:String = ""
+    
+    var punchStatus:Bool = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -81,9 +84,26 @@ class LMCDAttachDocVC: UIViewController,LMCDDocUploadDateDelegate {
         messageTextView.textColor = UIColor.lightGray
         keyboardHandler()
         didMessageChange()
+        self.punchStatus = preference.User_Status
+        self.attendanchCheck(status: self.punchStatus)
         
        
         // Do any additional setup after loading the view.
+    }
+    
+    func attendanchCheck(status:Bool){
+        switch status{
+        case false:
+            let punchPopUpcheckVC = AppVC.Shared.punchPopUpPage
+            punchPopUpcheckVC.status = status
+            punchPopUpcheckVC.fromvc = "doc"
+            punchPopUpcheckVC.attendanceDelegate = self
+            punchPopUpcheckVC.modalTransitionStyle = .crossDissolve
+            punchPopUpcheckVC.modalPresentationStyle = .overCurrentContext
+            self.present(punchPopUpcheckVC, animated: false)
+        default:
+            print("attendance marked")
+        }
     }
     
     fileprivate func didMessageChange() {
@@ -207,9 +227,15 @@ class LMCDAttachDocVC: UIViewController,LMCDDocUploadDateDelegate {
         uploadDocumentValidationVM.description = self.messageText
         uploadDocumentValidationVM.attachment = self.attachmentTF.text ?? ""
         if !uploadDocumentValidationVM.isValid{
+            if self.punchStatus == false{
+                
+                self.attendanchCheck(status: self.punchStatus)
+                
+            }else{
             self.uploadDetailsDelegate?.uploadDocumentDetails(date: self.dateTF.text ?? "", subject: self.subjectTF.text ?? "", description: messageText, dataString: dataString, formate: dataFormate)
             self.resetPage()
             self.navigationController?.popViewController(animated: true)
+            }
         }else{
             self.popupAlert(title: "", message: uploadDocumentValidationVM.brockenRules.first?.message, actionTitles: [okTitle], actions: [{action1 in
                 
@@ -232,6 +258,17 @@ class LMCDAttachDocVC: UIViewController,LMCDDocUploadDateDelegate {
     }
     */
 
+}
+
+extension LMCDAttachDocVC:AttendanceChangeProtocol{
+    
+    func changeAttendance(status: Bool) {
+        self.punchStatus = status
+        
+        
+    }
+    
+    
 }
 
 extension LMCDAttachDocVC : UITextViewDelegate{

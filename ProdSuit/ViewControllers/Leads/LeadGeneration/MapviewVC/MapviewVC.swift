@@ -97,12 +97,12 @@ class MapviewVC: UIViewController {
         deviceLocationService.coordinatesPublisher
         
             .receive(on: DispatchQueue.main)
-            .subscribe(on: DispatchQueue.global(qos: .background))
+            .subscribe(on: DispatchQueue.global(qos: .userInteractive))
             .first()
             .sink { completion in
                 print("Handle \(completion) for error and finished subscription.")
             } receiveValue: {[unowned self] coordinate in
-                
+            
                 self.coordinates = (coordinate.latitude, coordinate.longitude)
                 self.gmsMapCameraViewSetUp(self.coordinates)
             }.store(in: &mapLocationCancellable)
@@ -128,9 +128,9 @@ class MapviewVC: UIViewController {
         
         marker.position = CLLocationCoordinate2D(latitude: coordinates.lat, longitude: coordinates.lon)
         
-        marker.title = self.currentLocationText
         
-        marker.snippet = ""
+        
+        marker.snippet = self.currentLocationText
         marker.map = self.gmsMapView
         
     }

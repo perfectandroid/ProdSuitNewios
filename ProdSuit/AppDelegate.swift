@@ -9,14 +9,20 @@ import UIKit
 import CoreData
 import GoogleMaps
 import GooglePlaces
+import BackgroundTasks
+import CoreLocation
+import Combine
+
 
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate,CLLocationManagerDelegate {
 
 
-
-    var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+    let vc = UIViewController()
+    var locationServiceVm : LocationFetchViewModel?
+    lazy var bgCancellable = Set<AnyCancellable>()
+    lazy var fgCancellable = Set<AnyCancellable>()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -27,28 +33,70 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         GMSPlacesClient.provideAPIKey(googleMapKey)
         
+        self.locationServiceVm  = LocationFetchViewModel(service: DeviceLocationService.Shared)
+        backGroundPublisher.sink { status in
+            print("app in \(status)")
+            if status == "inactive"{
+                self.locationUpdateion()
+                
+            }
+            
+        }.store(in: &bgCancellable)
         
-        if #available(iOS 13.0, *){
-            
-            
-            
-        }else{
-            
-            
-        }
+        foreGroundPublisher.sink { status in
+            print("app in \(status)")
+            if status == "active"{
+                self.locationUpdateion()
+            }
+          
+        }.store(in: &fgCancellable)
+          
+        
+        
         return true
     }
+    
+    
+    func locationUpdateion(){
+       
+        let delay  = preference.User_module_LOCATION_INTERVAL
+        
+        DispatchQueue.global(qos: .background).async{
+            self.locationServiceVm?.locationCoordinateUpdates(vc: self.vc, { location in
+                self.locationServiceVm?.getAddress(location: (location.latitude,location.longitude), handler: { location_details in
+                    DispatchQueue.main.asyncAfter(deadline: .now()) {
+                        let locationAddress = location_details
+                        
+                        punch_loc_coordinate = (location.latitude,location.longitude)
+                        punch_address = locationAddress
+                        
+                        //print("location_details:\(location_details) === \(punch_loc_coordinate)")
+                    }
+                    
+                })
+            })
+        }
+    }
+   
 
     // MARK: UISceneSession Lifecycle
     
     func applicationDidEnterBackground(_ application: UIApplication) {
-        backgroundTask = UIApplication.shared.beginBackgroundTask(expirationHandler: {
-            if let indentifier = self.backgroundTask
-                                    as? UIBackgroundTaskIdentifier{
-                UIApplication.shared.endBackgroundTask(indentifier)
-            }
-        })
+//        bgTask = application.beginBackgroundTask(withName:"com.backgroundtask", expirationHandler: {() -> Void in
+//                // Do something to stop our background task or the app will be killed
+//                application.endBackgroundTask(self.bgTask)
+//                self.bgTask = UIBackgroundTaskIdentifier.invalid
+//            })
+//
+//        DispatchQueue.global(qos: .background).async {
+//               //make your API call here
+//               print("hello")
+//           }
+//           // Perform your background task here
+//           print("The task has started")
     }
+    
+    
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         // Called when a new scene session is being created.

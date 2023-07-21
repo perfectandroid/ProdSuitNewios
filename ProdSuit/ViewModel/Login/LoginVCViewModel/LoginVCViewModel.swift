@@ -89,11 +89,11 @@ class LoginViewModel{
         
         
         if responseHandler.statusCode == 0{
-            loginVc.successErrorView.showMessage(msg: loginSuccessText, style: .success, time: 3)
+            //loginVc.successErrorView.showMessage(msg: loginSuccessText, style: .success, time: 3)
             
             let userLoginDetailsInfo = UserLoginDetailsModel(datas: responseHandler.info)
             
-            DispatchQueue.main.asyncAfter(deadline: .now()+4) {
+            DispatchQueue.main.asyncAfter(deadline: .now()+1) {
                 
                 print("next page")
                 print("token==  "+userLoginDetailsInfo.Token)

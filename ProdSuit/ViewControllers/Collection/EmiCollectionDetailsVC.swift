@@ -48,8 +48,9 @@ class EmiCollectionDetailsVC: UIViewController {
         didSet{
             
            
+            transDateView.controller = self
             transDateView.HeaderNameLabel.setLabelValue(" Trans Date *")
-            transDateView.datePickerView.tintColor = AppColor.Shared.coloBlack
+            //transDateView.datePickerView.tintColor = AppColor.Shared.coloBlack
             transDateView.leftSideImageView.image = UIImage.init(named: "icon_emi_duedays")
         
             
@@ -60,9 +61,9 @@ class EmiCollectionDetailsVC: UIViewController {
     @IBOutlet weak var collectionDateView: TransDateView!{
         didSet{
             
-           
+            collectionDateView.controller = self
             collectionDateView.HeaderNameLabel.setLabelValue(" Collection Date *")
-            collectionDateView.datePickerView.tintColor = AppColor.Shared.coloBlack
+           // collectionDateView.datePickerView.tintColor = AppColor.Shared.coloBlack
             collectionDateView.leftSideImageView.image = UIImage.init(named: "ic_emi_todate")
             
         }
@@ -481,8 +482,8 @@ class EmiCollectionDetailsVC: UIViewController {
     
     func defaultValues(){
         
-        self.transDateView.datePickerView.date = Date()
-        self.collectionDateView.datePickerView.date = Date()
+        self.transDateView.hasInitialDateRepresentation = true
+        self.collectionDateView.hasInitialDateRepresentation = true
         self.transDateView.HeaderDetailTF.setTextFieldValue(currentDateString)
         self.collectionDateView.HeaderDetailTF.setTextFieldValue(currentDateString)
         
@@ -1186,8 +1187,8 @@ extension EmiCollectionDetailsVC : UITextFieldDelegate{
     func textFieldDidChangeSelection(_ textField: UITextField) {
         if textField == fineView.HeaderDetailTF{
             let model = emiAccountDetailsModel.EMIAccountDetailsList.first!
-            let installMentAmount = Double(installMentView.HeaderDetailTF.text ?? "0.00")!.format(f: ".2")
-            let fineAmount = Double(textField.text ?? "0.00")!.format(f: ".2")
+            let installMentAmount = (Double(installMentView.HeaderDetailTF.text ?? "0.00") ?? 0.00).format(f: ".2")
+            let fineAmount = (Double(textField.text ?? "0.00") ?? 0.00).format(f: ".2")
             collectionCalculatorVm = CollectionCalculator.init(openigBalance: model.balance, installment_amount: installMentAmount, fine_amount: fineAmount, closing: closing)
             
             if  let netamountString = collectionCalculatorVm?.calculateNetAmount() as? String{
@@ -1200,8 +1201,8 @@ extension EmiCollectionDetailsVC : UITextFieldDelegate{
         if textField == installMentView.HeaderDetailTF{
             
             let model = emiAccountDetailsModel.EMIAccountDetailsList.first!
-            let installMentAmount = Double(textField.text ?? "0.00")!.format(f: ".2")
-            let fineAmount = Double(fineView.HeaderDetailTF.text ?? "0.00")!.format(f: ".2")
+            let installMentAmount = (Double(installMentView.HeaderDetailTF.text ?? "0.00") ?? 0.00).format(f: ".2")
+            let fineAmount = (Double(textField.text ?? "0.00") ?? 0.00).format(f: ".2")
             collectionCalculatorVm = CollectionCalculator.init(openigBalance: model.balance, installment_amount: installMentAmount, fine_amount: fineAmount, closing: closing)
             
             if  let netamountString = collectionCalculatorVm?.calculateNetAmount() as? String{
@@ -1213,21 +1214,9 @@ extension EmiCollectionDetailsVC : UITextFieldDelegate{
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        guard let oldText = textField.text, let r = Range(range, in: oldText) else {
-            return true
-        }
-
-        let newText = oldText.replacingCharacters(in: r, with: string)
-        let isNumeric = newText.isEmpty || (Double(newText) != nil)
-        let numberOfDots = newText.components(separatedBy: ".").count - 1
-
-        let numberOfDecimalDigits: Int
-        if let dotIndex = newText.firstIndex(of: ".") {
-            numberOfDecimalDigits = newText.distance(from: dotIndex, to: newText.endIndex) - 1
-        } else {
-            numberOfDecimalDigits = 0
-        }
         
-        return isNumeric && numberOfDots <= 1 && numberOfDecimalDigits <= 2
+       let result = self.currencyPricePointFormateMethod(textField, shouldChangeCharactersIn: range, replacementString: string)
+        
+        return result
     }
 }

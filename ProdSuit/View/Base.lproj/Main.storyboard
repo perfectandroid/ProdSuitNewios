@@ -382,7 +382,9 @@
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yQA-7g-P5g" customClass="LoginButton" customModule="ProdSuit" customModuleProvider="target">
                                                         <rect key="frame" x="0.0" y="60" width="327" height="45"/>
                                                         <constraints>
-                                                            <constraint firstAttribute="height" constant="45" id="7B5-G0-w9A"/>
+                                                            <constraint firstAttribute="height" constant="45" id="7B5-G0-w9A">
+                                                                <variation key="heightClass=regular-widthClass=regular" constant="50"/>
+                                                            </constraint>
                                                         </constraints>
                                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                         <state key="normal" title="CONTINUE">
@@ -408,7 +410,9 @@
                                 <constraints>
                                     <constraint firstItem="D3E-0L-eze" firstAttribute="leading" secondItem="meg-1A-6a1" secondAttribute="leading" id="4u3-Ug-sQo"/>
                                     <constraint firstItem="D3E-0L-eze" firstAttribute="top" secondItem="meg-1A-6a1" secondAttribute="top" id="OfQ-cQ-CcZ"/>
-                                    <constraint firstAttribute="trailing" secondItem="xsO-aS-Oif" secondAttribute="trailing" constant="24" id="PqB-Yg-8rh"/>
+                                    <constraint firstAttribute="trailing" secondItem="xsO-aS-Oif" secondAttribute="trailing" constant="24" id="PqB-Yg-8rh">
+                                        <variation key="heightClass=regular-widthClass=regular" constant="80"/>
+                                    </constraint>
                                     <constraint firstItem="yR9-oY-YfV" firstAttribute="trailing" secondItem="D3E-0L-eze" secondAttribute="trailing" id="UdN-jD-iyT"/>
                                     <constraint firstItem="yR9-oY-YfV" firstAttribute="leading" secondItem="D3E-0L-eze" secondAttribute="leading" id="VYk-5e-KJj"/>
                                     <constraint firstItem="Ka3-nE-iaq" firstAttribute="trailing" secondItem="yR9-oY-YfV" secondAttribute="trailing" id="VqJ-la-QR4"/>
@@ -419,7 +423,9 @@
                                     <constraint firstItem="yR9-oY-YfV" firstAttribute="top" secondItem="D3E-0L-eze" secondAttribute="top" id="mWw-Ni-DO5"/>
                                     <constraint firstItem="Ka3-nE-iaq" firstAttribute="height" secondItem="yR9-oY-YfV" secondAttribute="height" multiplier="0.875" id="prk-ji-jNH"/>
                                     <constraint firstAttribute="trailing" secondItem="D3E-0L-eze" secondAttribute="trailing" id="uXx-Kr-1bS"/>
-                                    <constraint firstItem="xsO-aS-Oif" firstAttribute="leading" secondItem="meg-1A-6a1" secondAttribute="leading" constant="24" id="wly-5Y-R8L"/>
+                                    <constraint firstItem="xsO-aS-Oif" firstAttribute="leading" secondItem="meg-1A-6a1" secondAttribute="leading" constant="24" id="wly-5Y-R8L">
+                                        <variation key="heightClass=regular-widthClass=regular" constant="80"/>
+                                    </constraint>
                                     <constraint firstItem="Ka3-nE-iaq" firstAttribute="leading" secondItem="yR9-oY-YfV" secondAttribute="leading" id="yZt-bG-MKK"/>
                                 </constraints>
                             </view>

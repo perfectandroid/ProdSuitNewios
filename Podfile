@@ -10,5 +10,7 @@ target 'ProdSuit' do
   pod 'DropDown'
   pod 'GoogleMaps', '7.4.0'
   pod 'GooglePlaces', '7.4.0'
+  pod 'JACalendar'
+  pod 'GoogleMLKit/BarcodeScanning', '3.2.0'
 
 end

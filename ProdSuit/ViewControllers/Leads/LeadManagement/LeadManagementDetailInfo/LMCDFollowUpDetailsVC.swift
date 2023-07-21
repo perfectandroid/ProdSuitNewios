@@ -17,7 +17,11 @@ class LMCDFollowUpDetailsVC: UIViewController {
     @IBOutlet weak var nxtActionEmployeeTF: NextActionEmployeeTF!
     @IBOutlet weak var nextActionDepartmentTF: NextActionDepartMentTF!
     @IBOutlet weak var nxtActionPriorityTF: NextActionPriorityTF!
-    @IBOutlet weak var nxtActionFollowUpDateTF: NextActionDateTF!
+    @IBOutlet weak var nxtActionFollowUpDateTF: NextActionDateTF!{
+        didSet{
+            self.nxtActionFollowUpDateTF.controller = self
+        }
+    }
     @IBOutlet weak var nxtActionTypeTF: FollowUpActionTypeTF!
     @IBOutlet weak var nxtActionTF: NextActionTF!
     
@@ -99,7 +103,11 @@ class LMCDFollowUpDetailsVC: UIViewController {
     // Date  Outlets
     @IBOutlet weak var dateBGView: UIView!
     
-    @IBOutlet weak var dateTF: UITextField!
+    @IBOutlet weak var dateTF: FollowUPDateTF!{
+        didSet{
+            self.dateTF.controller = self
+        }
+    }
     
     
     // Status By Outlets
@@ -167,6 +175,7 @@ class LMCDFollowUpDetailsVC: UIViewController {
     var coordinates: (lat: Double, lon: Double) = (0, 0)
     lazy var locationtokens = Set<AnyCancellable>()
     lazy var imagePickerVm : ImagePickerManager = ImagePickerManager()
+    var punchStatus:Bool = false
     
     lazy var imageStringArray : [String] = []{
         didSet{
@@ -314,11 +323,28 @@ class LMCDFollowUpDetailsVC: UIViewController {
         keyboardHandler()
         didChangeCustomerMessage()
         didChangeEmployeeMessage()
+        self.punchStatus = preference.User_Status
+        self.attendanchCheck(status: self.punchStatus)
         
         
        // scrollHeightCalculate()
         // Do any additional setup after loading the view.
         
+    }
+    
+    func attendanchCheck(status:Bool){
+        switch status{
+        case false:
+            let punchPopUpcheckVC = AppVC.Shared.punchPopUpPage
+            punchPopUpcheckVC.status = status
+            punchPopUpcheckVC.fromvc = "followUp"
+            punchPopUpcheckVC.attendanceDelegate = self
+            punchPopUpcheckVC.modalTransitionStyle = .crossDissolve
+            punchPopUpcheckVC.modalPresentationStyle = .overCurrentContext
+            self.present(punchPopUpcheckVC, animated: false)
+        default:
+            print("attendance marked")
+        }
     }
     
     fileprivate func keyboardHandler() {
@@ -880,7 +906,7 @@ class LMCDFollowUpDetailsVC: UIViewController {
         self.nxtActionPriorityTF.setTextFieldValue("")
         self.selectedDepartment = DepartmentDetailsInfoModel(datas: [:])
         self.nextActionDepartmentTF.setTextFieldValue(self.selectedDepartment?.DeptName ?? "")
-        self.nxtActionFollowUpDateTF.datePickerView.date = Date()
+        //self.nxtActionFollowUpDateTF.datePickerView.date = Date()
         
         
     }
@@ -917,8 +943,12 @@ class LMCDFollowUpDetailsVC: UIViewController {
     @IBAction func submitButtonAction(_ sender: UIButton) {
         
         
-        let nextFollowUpDateString = self.self.nxtActionFollowUpDateTF.text ?? ""
+        let nextFollowUpDateString =  self.self.nxtActionFollowUpDateTF.text ?? ""
+        
+        
         let convertDateString = DateTimeModel.shared.formattedDateFromString(dateString: self.dateTF.text ?? "", withFormat: "yyyy-MM-dd")!
+        
+        
         self.followUpValidationVm.actionTypeValue = actionTypeValue
         self.followUpValidationVm.selectedSegment = selectedSegmentValue
         self.followUpValidationVm.followUpParamValidation = FollowUpParamValidation(siteActionType: "\(actionTypeValue)",
@@ -970,9 +1000,15 @@ class LMCDFollowUpDetailsVC: UIViewController {
         if !followUpValidationVm.isValid{
             
             
-            
+            if self.punchStatus == false{
+                
+                self.attendanchCheck(status: self.punchStatus)
+                
+            }else{
             
             self.saveFollowUpDetails("\(self.followUpValidationVm.actionTypeValue)",followUpInfo)
+                
+            }
             
         }else{
             self.popupAlert(title: "", message: followUpValidationVm.brockenRules.first?.message, actionTitles: [okTitle], actions: [{action1 in
@@ -1055,12 +1091,12 @@ class LMCDFollowUpDetailsVC: UIViewController {
     
     @IBAction func actionTypeButtonAction(_ sender: UIButton) {
         
-        if actionTypeValue == 0 {
+        //if actionTypeValue == 0 {
            
             populateActionTypeListingPopUp()
             
             
-        }
+       // }
     }
     
     
@@ -1084,9 +1120,10 @@ class LMCDFollowUpDetailsVC: UIViewController {
     }
     
     @IBAction func locationFetchButtonAction(_ sender: UIButton) {
+        deviceLocationService.requestLocationUpdates()
         locationCoordinateUpdates()
         deniedLocationAccess()
-        deviceLocationService.requestLocationUpdates()
+        
     }
     
     func locationCoordinateUpdates() {
@@ -1231,4 +1268,16 @@ extension LMCDFollowUpDetailsVC : UITextViewDelegate{
             
 
     }
+}
+
+
+extension LMCDFollowUpDetailsVC:AttendanceChangeProtocol{
+    
+    func changeAttendance(status: Bool) {
+        self.punchStatus = status
+        
+        
+    }
+    
+    
 }

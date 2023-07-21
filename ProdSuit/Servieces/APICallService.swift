@@ -223,3 +223,7 @@ struct ImageData{
     var imgData:Data
 }
 
+
+
+
+

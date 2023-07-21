@@ -1404,6 +1404,8 @@ class LeadGenerationVCViewModel{
         
     }
     
+   
+    
     //MARK: - ========= productAPICall() =============
     func productAPICall(){
         
@@ -1678,7 +1680,7 @@ class LeadGenerationVCViewModel{
         if let setDefaultValueInfo = self.controller.selectedDefaultValue as? SelectedLeadGenerationDefaultValue{
             let bankKey = preference.appBankKey
             let fk_employee = "\(preference.User_Fk_Employee)"
-            let UserName = self.controller.selectedUserFromCollectionList.Name
+            let UserName = self.controller.selectedUserFromCollectionList.Name == nil ? "" : self.controller.selectedUserFromCollectionList.Name
             let TransMode = transMode
             let ID_LeadGenerate = "0"
             let LgLeadDate = DateTimeModel.shared.formattedDateFromString(dateString: self.controller.leadGenerationValidationVM.leadDateString)
@@ -2107,7 +2109,7 @@ class LeadGenerationVCViewModel{
     
     
     //MARK: - ========= PROJECT PRODUCT CELL DETAILS ==============
-    func project_ProductDetailCell(cell:ProjectProductDetailsTVC,info:SelectedProductDetailsInfo){
+    func project_ProductDetailCell(cell:ProjectProductDetailsTVC,info:SelectedProductDetailsInfo,clickAddProduct:Bool,scannedAddedItemList:[MultiProductAddModel]){
         
         
         cell.categoryTextField.dropDownButton.tag = 0
@@ -2115,6 +2117,10 @@ class LeadGenerationVCViewModel{
         cell.statusTextField.dropDownButton.tag = 2
         cell.actionTypeTextField.dropDownButton.tag = 3
         cell.nameTextField.dropDownButton.tag = 4
+        cell.clickAddProduct = clickAddProduct
+        cell.productaddList = scannedAddedItemList
+      
+        
         
         
         
@@ -2132,9 +2138,20 @@ class LeadGenerationVCViewModel{
             cell.nameTextField.text = item.EmpName
             cell.subCategoryQtyTextField.text = item.quantity == "" ? "" : item.quantity
             cell.dateTextField.text = item.date
+            cell.mrpTextField.setTextFieldValue(item.MRP ?? "0.00")
+            cell.offerPriceTextField.setTextFieldValue(item.Price ?? "0.00")
 
         }
     }
+    
+//    func scannedDetails(cell:ProjectProductDetailsTVC,details:ItemSearchDataInfoModel){
+//        cell.isZeroProject  = NSNumber.init(value: Int(details.ID_Product)!)
+//        cell.categoryTextField.setTextFieldValue(details.CategoryName)
+//        cell.subCategoryTextField.setTextFieldValue(details.ProductName)
+//        cell.mrpTextField.setTextFieldValue(details.MRP)
+//        cell.offerPriceTextField.setTextFieldValue(details.Price)
+//
+//    }
     
     
    
@@ -2222,7 +2239,10 @@ class LeadGenerationVCViewModel{
                     
                     if self.controller.leadWalkingList.count > 0{
                         self.controller.expandedSectionHeaderNumber = 0
-                        self.controller.leadGenerateTableView.reloadData()
+                        self.controller.leadGenerateTableView.reloadSections(IndexSet(integer: 0), with: .none)
+                    }else{
+                        self.controller.expandedSectionHeaderNumber = -1
+                        self.controller.popupAlert(title: "", message: noDataString, actionTitles: [okTitle], actions: [{action1 in },nil])
                     }
 //                    else{
 //                        self.controller.expandedSectionHeaderNumber = -1

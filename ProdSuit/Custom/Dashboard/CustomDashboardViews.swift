@@ -190,6 +190,8 @@ class ImageSliderView:UIView,UIScrollViewDelegate{
     var offSet: CGFloat = 0
     var currentPage = 0
     
+   
+    
     private let pageControll = UIPageControl()
     
     private var timer : DispatchSourceTimer?
@@ -198,7 +200,7 @@ class ImageSliderView:UIView,UIScrollViewDelegate{
        
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.backgroundColor = UIColor.systemYellow
+        //scrollView.backgroundColor = UIColor.systemYellow
         scrollView.isPagingEnabled = true
         scrollView.bounces = false
         scrollView.showsHorizontalScrollIndicator = false
@@ -267,10 +269,11 @@ class ImageSliderView:UIView,UIScrollViewDelegate{
 
             x = CGFloat(i) * CGFloat(contentWidth)
 
-            let imageView:UIImageView = UIImageView(frame: CGRect(x: x, y: 0, width: self.bounds.width, height: self.bounds.height))
+            let imageView:UIImageView = ScaledHeightImageView(frame: CGRect(x: x, y: 0, width: self.bounds.width, height: self.bounds.height))
             imageView.backgroundColor = generateRandomColor()
             imageView.clipsToBounds = true
-            imageView.contentMode = .scaleAspectFill
+            
+            //imageView.contentMode = .scaleAspectFill
             
             
             DispatchQueue.main.async {
@@ -302,6 +305,7 @@ class ImageSliderView:UIView,UIScrollViewDelegate{
     func stop(){
         timer?.cancel()
         timer = nil
+       
         
         
     }
@@ -368,7 +372,7 @@ class ImageSliderView:UIView,UIScrollViewDelegate{
             
         let randomColor = UIColor(red: redValue, green: greenValue, blue: blueValue, alpha: 1.0)
             
-        return randomColor
+        return AppColor.Shared.coloBlack.withAlphaComponent(0.85)
         }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
@@ -422,6 +426,26 @@ class CompanyLogLabel:UILabel{
         //self.adjustsFontSizeToFitWidth = true
         self.textColor = AppColor.Shared.companyLog
     }
+}
+
+class ScaledHeightImageView: UIImageView {
+
+    override var intrinsicContentSize: CGSize {
+
+        if let myImage = self.image {
+            let myImageWidth = myImage.size.width
+            let myImageHeight = myImage.size.height
+            let myViewWidth = self.frame.size.width
+ 
+            let ratio = myViewWidth/myImageWidth
+            let scaledHeight = myImageHeight * ratio
+
+            return CGSize(width: myViewWidth, height: scaledHeight)
+        }
+
+        return CGSize(width: -1.0, height: -1.0)
+    }
+
 }
 
 
@@ -669,4 +693,4 @@ struct Film {
 //
 //
 //
-//}
+//}f

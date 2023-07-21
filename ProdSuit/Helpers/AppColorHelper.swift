@@ -183,6 +183,7 @@ struct AppColor{
     let histroyBgColor3 :UIColor = UIColor(rgb: 0xeaeff0)
     
     let D6D6D6  : UIColor = UIColor(rgb: 0xd6d6d6)
+    let punchYesColor  : UIColor = UIColor(rgb: 0x1B6B93)
     
     
     

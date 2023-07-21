@@ -40,6 +40,7 @@ struct CellIdentifier{
     let leadLocationDetailsCell = "locationDetailsTVC"
     let leadUploadImageViewCell = "uploadImageViewTVC"
     let leadGenConfirmCell = "leadGenConfirmTVC"
+    let leadGenerationProductAddCell = "lGProductAddTVC"
     let leadRequestCell = "leadRequestTVC"
     let leadManagementCategoryListCell = "leadManagementCategoryListTVC"
     let leadManagementInfoCell = "leadManagementInfoTVC"
@@ -83,6 +84,7 @@ struct AppIdentifier{
     let Chart_POP_UP_VC_ID = "chartPOPUPVC"
     let Notification_VC_ID = "notificationVC"
     let ReadNotification_VC_ID = "notificationReadVC"
+    let PunchInOut_VC_ID = "punchInOutVC"
     
     // LEADS MENU VC'S
     
@@ -95,6 +97,8 @@ struct AppIdentifier{
     
     
     let LEAD_GENERATION_VC_ID = "leadGenerationVC"
+    
+    
     
     //let Reusable_Table_VC_ID = "reusableTableVC"
     
@@ -188,6 +192,8 @@ struct AppVC{
     let NotificationPage = AppStoryBoard.Dashboard.InstantiateVC(identifiter: AppIdentifier.shared.Notification_VC_ID) as! NotificationVC
     
     let ReadNotificationPage = AppStoryBoard.Dashboard.InstantiateVC(identifiter: AppIdentifier.shared.ReadNotification_VC_ID) as! NotificationReadVC
+    
+    let punchPopUpPage = AppStoryBoard.Dashboard.InstantiateVC(identifiter: AppIdentifier.shared.PunchInOut_VC_ID) as! PunchInOutVC
     
     // HOME MENUE LEAD SECTION
     

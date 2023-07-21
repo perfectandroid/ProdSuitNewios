@@ -8,6 +8,12 @@
 import UIKit
 import Combine
 import GoogleMaps
+import AVFoundation
+import PhotosUI
+import MLKitBarcodeScanning
+import MLKitVision
+
+
 
 struct leadGeneratModel{
     var name:String
@@ -15,7 +21,7 @@ struct leadGeneratModel{
     var rows:Int
 }
 
-class LeadGenerationVC: UIViewController{
+class LeadGenerationVC: UIViewController,GeneralSettingAPIProtocol,AVCaptureMetadataOutputObjectsDelegate{
     
    lazy var sectionLabel : UILabel = {
         let headerLabel = UILabel()
@@ -36,6 +42,7 @@ class LeadGenerationVC: UIViewController{
     var kHeaderSectionTag = 200
     var coordinates: (lat: Double, lon: Double) = (0, 0)
     var keyboardYposition:CGFloat = 0
+    var expectedDateString : String = currentDateString
     var leadWalkingList : [WalkingCustomerDetailsInfo] = []
     
     {
@@ -181,6 +188,9 @@ class LeadGenerationVC: UIViewController{
             }
         }
     }
+    
+    let images = ["requested_color 1","leadfrom_color 1","user_color 1","communication_color","product_color 1","ic_location1","upload_color 1"]
+    
     let defaultImage = UIImage(named: "updef")
 
     lazy var uploadImagList : [UIImage?] = [defaultImage,defaultImage]{
@@ -213,9 +223,14 @@ class LeadGenerationVC: UIViewController{
         return item.first!
     }
     
+    var generalSettingsValue = false
+    var punchStatus:Bool = false
+    
     var searchNameOrMobileText : String = ""
     
-   var leadGenerationVm:LeadGenerationVCViewModel!
+    let commonNetworkVM  = SharedNetworkCall.Shared
+    
+    var leadGenerationVm:LeadGenerationVCViewModel!
     
     lazy var keyboardCancellable = Set<AnyCancellable>()
     
@@ -245,6 +260,35 @@ class LeadGenerationVC: UIViewController{
         }.store(in: &keyboardCancellable)
     }
     
+    var clickAddProduct = false
+    
+    
+    //FIXME: - SCANING BAR CODE VARIABLE()
+    
+    var captureSession: AVCaptureSession!
+    var previewLayer: AVCaptureVideoPreviewLayer!
+    var qrCodeFrameView: UIView?
+    var scannerBounds = CALayer()
+    var uploadButton : UIButton?
+    let format:BarcodeFormat = .all
+    var visionImage : VisionImage!
+    var barcodeStringValue  = ""
+    var successErrorView : SuccessErrorView!
+    
+    var scannedAddedItemList : [MultiProductAddModel] = []
+    var scannedItemList : [ItemSearchDataInfoModel] = []
+    
+    
+   lazy var scanbackgroundView : UIView = {
+        
+       let vw = UIView()
+       
+       vw.translatesAutoresizingMaskIntoConstraints = false
+       vw.setBGColor(color: AppColor.Shared.coloBlack)
+       
+       return vw
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -252,7 +296,7 @@ class LeadGenerationVC: UIViewController{
         
        
         
-        
+        getGeneralSettingsAPICall()
         
         
         
@@ -266,7 +310,7 @@ class LeadGenerationVC: UIViewController{
             // Fallback on earlier versions
             leadGenerateTableView.contentInsetAdjustmentBehavior = .never
         }
-        
+        self.successErrorView = SuccessErrorView(bgView: self.leadGenerateTableView)
         keyboardHandler()
         self.tableviewDelegatesCall()
         // Do any additional setup after loading the view.
@@ -276,6 +320,8 @@ class LeadGenerationVC: UIViewController{
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        getGeneralSettingsAPICall()
         
         self.list = [leadGeneratModel(name: "Lead Request", list: [], rows: 0),leadGeneratModel(name: "Lead Details", list: ["lead details"], rows: 1),leadGeneratModel(name: "Customer Details", list: ["name","result","search"],rows: 3),leadGeneratModel(name: "More Communication Info", list: ["More Info"], rows: 1),leadGeneratModel(name: "Project/Product Details", list: ["Project Product Details"], rows: 1),leadGeneratModel(name: "Location Details", list: ["Location Details"], rows: 1),leadGeneratModel(name: "Upload Images", list: ["Upload Images"], rows: 1)]
         
@@ -290,6 +336,35 @@ class LeadGenerationVC: UIViewController{
         
         self.leadGenerationVm = LeadGenerationVCViewModel(controller: self)
         
+        self.punchStatus = preference.User_Status
+        attendanceMarkCheck()
+        
+    }
+    
+    func getGeneralSettingsAPICall(){
+        
+        self.getGeneralSettingsAPICall(commonNetworkVM: commonNetworkVM) { gsValue in
+            print("general settings:\(gsValue)")
+            self.generalSettingsValue = gsValue
+            self.leadGenerateTableView.reloadData()
+        }
+    }
+    
+    
+    
+    fileprivate func attendanceMarkCheck() {
+        switch self.punchStatus{
+        case false:
+            let punchPopUpcheckVC = AppVC.Shared.punchPopUpPage
+            punchPopUpcheckVC.status = punchStatus
+            punchPopUpcheckVC.fromvc = "lead"
+            punchPopUpcheckVC.attendanceDelegate = self
+            punchPopUpcheckVC.modalTransitionStyle = .crossDissolve
+            punchPopUpcheckVC.modalPresentationStyle = .overCurrentContext
+            self.present(punchPopUpcheckVC, animated: false)
+        default:
+            print("attendance marked")
+        }
     }
 
 
@@ -402,12 +477,17 @@ class LeadGenerationVC: UIViewController{
         
         if !leadGenerationValidationVM.isValid{
            print("validation success")
+            
+            if self.punchStatus == false{
+                attendanceMarkCheck()
+            }else{
             let confirmPage = AppVC.Shared.leadGenConfirmPage
             confirmPage.modalTransitionStyle = .coverVertical
             confirmPage.modalPresentationStyle = .overCurrentContext
             confirmPage.leadConfirmDetailsDelegate = self
             confirmPage.leadGenerateConfirmList = leadGenerateConfirmList
             self.present(confirmPage, animated: true, completion: nil)
+            }
             
         }else{
             self.popupAlert(title: "",message: leadGenerationValidationVM.brockenRules.first?.message, actionTitles: [okTitle], actions: [{action1 in
@@ -478,7 +558,13 @@ class LeadGenerationVC: UIViewController{
         self.leadWalkingList = []
         locationAddress = ""
         
-         
+        if expandedSectionHeaderNumber != -1{
+            let index = NSIndexPath(row: 0, section: expandedSectionHeaderNumber)
+            self.leadGenerateTableView.selectRow(at: index as IndexPath, animated: false, scrollPosition: .none)
+            expandedSectionHeaderNumber = -1
+        }
+        
+        expectedDateString = currentDateString
         //self.leadGenerateTableView.reloadSections(IndexSet(integer: 5), with: .none)
         
         
@@ -488,6 +574,7 @@ class LeadGenerationVC: UIViewController{
     
 
 }
+
 
 
 extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
@@ -526,6 +613,7 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
             return cell
         case 1:
             let cell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.shared.leadGenerationCell) as! LeadGenerationTVC
+            
             if leadDetailsDate == ""{
                 leadDetailsDate = DateTimeModel.shared.stringDateFromDate(Date())
             }
@@ -538,6 +626,7 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
             cell.leadSourceSubmediaField.isHidden = selectedLeadThrough.HasSub == 1 ? false : true
             cell.dateTextField.text = leadDetailsDate
             cell.dateTextField.leadDateDelegate = self
+            cell.dateTextField.controller = self
             
             let type:Int = selectedLeadSourceInfo.LeadFromType as! Int
             
@@ -620,17 +709,23 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
             let cell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.shared.leadProjectProductDetailsCell) as! ProjectProductDetailsTVC
             let folloUpStatus : NSNumber = self.selectedProductDetailInfo.Status ?? 0
             switch folloUpStatus {
-            case 1:
-                cell.hasFollowUp = true
-            case 2,3:
+            case 2:
+                cell.hasFollowUp = false
+            case 3:
                 cell.hasFollowUp = false
             default:
-                cell.hasFollowUp = false
+                cell.hasFollowUp = true
             }
             cell.productDelegate = self
             cell.enquiryDelegate = self
             cell.quantityDelegate = self
+            cell.offerPriceDelegate = self
+            cell.expectedDateTF.controller = self
+            cell.expectedDateTF.delegates = self
+            
+            cell.expectedDateTF.setTextFieldValue(expectedDateString)
             cell.dateTextField.date_delegate = self
+            cell.dateTextField.controller = self
             if self.selectedProductDetailInfo.date == nil{
                 self.selectedProductDetailInfo.date = DateTimeModel.shared.stringDateFromDate(Date())
             }
@@ -647,7 +742,21 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
             
             cell.nameTextField.dropDownButton.addTarget(self, action: #selector(followUpEmployeeButtonAction(sender:)), for: .touchUpInside)
             
-            self.leadGenerationVm.project_ProductDetailCell(cell: cell, info: self.selectedProductDetailInfo)
+            
+            
+            
+            
+            // add product action button
+            
+            cell.productAddButton.addTarget(self, action: #selector(productAddButtonAction(_:)), for: .touchUpInside)
+            
+            cell.scaningButton.addTarget(self, action: #selector(scaningButtonAction(_:)), for: .touchUpInside)
+            
+            // product reset action button
+                        cell.productResetButton.addTarget(self, action: #selector(productRestButtonAction(_:)), for: .touchUpInside)
+            
+            
+            self.leadGenerationVm.project_ProductDetailCell(cell: cell, info: self.selectedProductDetailInfo,clickAddProduct: self.clickAddProduct,scannedAddedItemList: self.scannedAddedItemList)
             return cell
         case 5:
             let cell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.shared.leadLocationDetailsCell) as! LocationDetailsTVC
@@ -680,6 +789,328 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
 //        cell.textLabel?.numberOfLines = 0
         
        
+    }
+    
+    //FIXME: - SCANNING BUTTON ACTION()
+    @objc func scaningButtonAction(_ sender: UIButton){
+        
+        scanImage()
+        
+        
+    }
+    
+    func failed() {
+        let ac = UIAlertController(title: "Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+        captureSession = nil
+    }
+    
+    func scanImage(){
+        
+        self.view.setBGColor(color: UIColor.clear)
+        self.view.subviews.map{ self.view.hideViews(hideView: $0) }
+        
+        let center = self.view.center
+        let width = self.view.frame.width * 0.5
+        let height = width
+        let scannerRect = CGRect(x: (center.x - width/2) , y: (center.y - width), width: width, height: height)
+        
+        
+        
+        
+        
+        captureSession = AVCaptureSession()
+
+        guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
+        let videoInput: AVCaptureDeviceInput
+
+        do {
+            videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
+        } catch {
+            return
+        }
+
+        if (captureSession.canAddInput(videoInput)) {
+            captureSession.addInput(videoInput)
+            
+        } else {
+            failed()
+            return
+        }
+
+        let metadataOutput = AVCaptureMetadataOutput()
+
+        if (captureSession.canAddOutput(metadataOutput)) {
+            
+            
+            captureSession.addOutput(metadataOutput)
+            if let video = previewLayer{
+            metadataOutput.rectOfInterest = video.metadataOutputRectConverted(fromLayerRect: scannerRect)
+                
+            }
+            
+            
+            metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+            metadataOutput.metadataObjectTypes = [.qr,.aztec,.ean13,.ean8,.code39,.code128,.code93]
+        } else {
+            failed()
+            return
+        }
+        
+        
+
+                
+        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        
+         
+        scannerBounds.frame = scannerRect
+        scannerBounds.borderColor = UIColor.clear.cgColor
+        scannerBounds.borderWidth = 5
+        scannerBounds.contents = UIImage(named: "scanframe")?.cgImage
+        scannerBounds.contentsGravity = .resizeAspect
+        scannerBounds.isGeometryFlipped = true
+        
+        let uploadwidth = self.view.frame.width * 0.8
+       
+        uploadButton = UIButton()
+        
+        if let uploadBtn = uploadButton{
+            uploadBtn.frame = CGRect.init(x: (center.x - uploadwidth/2), y: scannerRect.origin.y + scannerRect.height + 25, width: uploadwidth, height: 40)
+            uploadBtn.setCornerRadius(size: 20)
+    
+            uploadBtn.setTitle("Upload from gallary", for: .normal)
+            uploadBtn.leftImage(image: UIImage.init(named: "image")!, renderMode: .alwaysOriginal)
+        
+            uploadBtn.setTitleColor(AppColor.Shared.coloBlack, for: .normal)
+            uploadBtn.titleLabel?.setFontSize(15, font: .regular, autoScale: true)
+            uploadBtn.layoutSubviews()
+        //uploadButton.title
+            uploadBtn.setBGColor(color: AppColor.Shared.colorWhite)
+        
+        self.view.addSubview(uploadBtn)
+        
+        let tapgesture = UITapGestureRecognizer.init(target: self, action: #selector(uploadImageButtonAction(_:)))
+        tapgesture.numberOfTapsRequired = 1
+        self.view.isUserInteractionEnabled = true
+            uploadBtn.isUserInteractionEnabled = true
+            uploadBtn.addTarget(self, action: #selector(uploadImageButtonAction(_:)), for: .touchUpInside)
+        }
+        
+        
+        
+        
+        previewLayer.frame = view.layer.bounds
+        previewLayer.videoGravity = .resizeAspectFill
+        
+        view.layer.insertSublayer(previewLayer, at: 0)
+//        self.previewLayer.insertSublayer(uploadButton.layer
+//                                         ,above: self.scannerBounds)
+        
+        self.view.layer.insertSublayer(scannerBounds, above: previewLayer)
+        
+        
+
+        captureSession.startRunning()
+        
+        
+    }
+    
+
+    
+    @objc func uploadImageButtonAction(_ sender : UIButton){
+        
+        print("select from gallary")
+        
+        if #available(iOS 14, *) {
+            var configuration = PHPickerConfiguration()
+            configuration.selectionLimit = 1
+            configuration.filter = .any(of: [.images])
+            let picker = PHPickerViewController(configuration: configuration)
+            picker.delegate = self
+            self.present(picker, animated: true, completion: nil)
+        } else {
+            // Fallback on earlier versions
+            if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
+                let imagePicker = UIImagePickerController()
+                    imagePicker.delegate = self
+                    imagePicker.sourceType = .camera;
+                    imagePicker.allowsEditing = false
+                self.present(imagePicker, animated: true, completion: nil)
+            }
+
+        }
+           
+         
+        
+         
+       
+        
+    }
+    
+    func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+        captureSession.stopRunning()
+        
+        
+        
+        
+        if metadataObjects.count == 0 {
+                
+ 
+            return
+         }
+
+        if let metadataObject = metadataObjects.first {
+            guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject else { return }
+            guard let stringValue = readableObject.stringValue else { return }
+            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+            found(code: stringValue)
+        }
+
+        UIView.animate(withDuration: 3, delay: 0) {
+            self.previewLayer.removeFromSuperlayer()
+            self.scannerBounds.removeFromSuperlayer()
+            self.uploadButton?.removeFromSuperview()
+            self.view.setBGColor(color: AppColor.Shared.colorWhite)
+            self.view.subviews.map{ self.view.showViews(showView: $0) }
+
+            self.dismiss(animated: true)
+        }
+       
+    }
+    
+//    func filterArrayItem<T:Hashable>(list:[T],id:Int) -> T{
+//        let fetchedItem = list.filter { return Int($0.hashValue)  == id }
+//        return fetchedItem.first!
+//    }
+    
+    //FIXME: -  barcodeSearchAPIInfo()
+    fileprivate func barcodeSearchAPIInfo() {
+        self.commonNetworkVM.leadGenerationAPIManager?.barcodeSearchAPIInfo(self.barcodeStringValue,modelKey: "ItemList") { responseHandler in
+            
+            
+            let statusCode = responseHandler.statusCode
+            let message = responseHandler.message
+            let info = responseHandler.info
+            
+            if statusCode == 0{
+                let list  = info.value(forKey: "ItemSearchListData") as? [NSDictionary] ?? []
+                
+                self.scannedItemList = []
+                self.scannedItemList = list.map { ItemSearchDataInfoModel.init(datas: $0) }
+                let info = self.scannedItemList.first!
+                self.selectedProductDetailInfo.ID_Product = NSNumber(value: Int(info.ID_Product)!)
+                self.selectedProductDetailInfo.ProductName = info.ProductName
+                self.selectedProductDetailInfo.ProdShortName  = info.ProdShortName
+                self.selectedProductDetailInfo.MRP = info.MRP
+                self.selectedProductDetailInfo.Price = info.Price
+                self.selectedProductDetailInfo.ID_Category = NSNumber(value: Int(info.FK_Category)!)
+                self.selectedProductDetailInfo.CategoryName = info.CategoryName
+                self.selectedProductDetailInfo.Project = NSNumber(value: Int(info.Project)!)
+                
+                //self.scannedAddedItemList = []
+//                self.scannedAddedItemList = self.scannedItemList.map{ ScannedProductInfo(id_product: $0.ID_Product, productName: $0.ProductName, prodshortname: $0.ProdShortName, mrp: $0.MRP, price: $0.Price, fk_category: $0.FK_Category, categoryname: $0.CategoryName, project: $0.Project) }
+                print("list:\(self.scannedItemList)")
+                
+            }else{
+                self.popupAlert(title: "", message: message, actionTitles: [okTitle], actions: [{action1 in },nil])
+            }
+            
+        }
+    }
+    
+    func found(code: String) {
+        
+        print("bar code \(code)")
+        
+        if code.count == 0{
+
+            
+            let message = "Unable to recognize valid barcode from the image"
+            
+            self.popupAlert(title: "", message: message, actionTitles: [okTitle], actions: [{action1 in
+                            print("Category cannot be blank")
+                        },nil])
+            
+        }else{
+            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+            self.barcodeStringValue = code
+            barcodeSearchAPIInfo()
+         
+        }
+        
+        
+        
+    }
+    
+    @objc func productAddButtonAction(_ sender: UIButton){
+        print("product add button clicked")
+        
+        var multiProductAddValidation = MultiProductAddValidation(brockenRules: [])
+        
+        multiProductAddValidation.categoryString = self.selectedProductDetailInfo.CategoryName ?? ""
+        multiProductAddValidation.enquiry = self.selectedProductDetailInfo.EnquiryText ?? ""
+        multiProductAddValidation.actionType = self.selectedProductDetailInfo.Status == nil ? "" : "\(self.selectedProductDetailInfo.Status!)"
+
+        multiProductAddValidation.subActionType = self.selectedProductDetailInfo.ActnTypeName ?? ""
+        multiProductAddValidation.project_dateString = self.selectedProductDetailInfo.date ?? DateTimeModel.shared.stringDateFromDate(Date())
+        multiProductAddValidation.priorityString = self.selectedProductDetailInfo.PriorityName ?? ""
+        
+        if multiProductAddValidation.isValid == false{
+            self.popupAlert(title: "",message: multiProductAddValidation.brockenRules.first?.message, actionTitles: [okTitle], actions: [{action1 in
+                
+            },nil])
+        }else{
+            print("Add successfully")
+            if let info = self.selectedProductDetailInfo as? SelectedProductDetailsInfo{
+                let itemInfo =  MultiProductAddModel(Project:"\(info.Project!)", CategoryName: info.CategoryName!, ID_Category: "\(info.ID_Category ?? 0)", ModelString: info.ModelString ?? "", ID_Product: "\(info.ID_Product ?? 0)", ProductName: info.ProductName ?? "", quantity: info.quantity ?? "",ProductCode: "\(info.ProductCode ?? 0)", PriorityName: info.PriorityName ?? "", ID_Priority: "\(info.ID_Priority ?? 0)", EnquiryText: info.EnquiryText ?? "", Status: "\(info.Status ?? 0)", ID_NextAction: "\(info.ID_NextAction ?? 0)", NxtActnName: info.NxtActnName ?? "", ID_ActionType: "\(info.ID_ActionType ?? 0)", ActnTypeName: info.ActnTypeName ?? "", ActionMode: "\(info.ActionMode ?? 0)", date: info.date ?? "", ProdShortName: info.ProdShortName ?? "",MRP: info.MRP,Price: info.Price,expectedDateString: info.expectedDateString,ID_Employee: "\(info.ID_Employee ?? 0)",EmpName: info.EmpName ?? "",DepartmentName: info.DepartmentName ?? "",DesignationName: info.DesignationName ?? "")
+            
+                self.scannedAddedItemList.append(itemInfo)
+                
+                self.selectedProductDetailInfo = SelectedProductDetailsInfo()
+            }
+            
+        }
+        
+        
+        
+        if self.scannedAddedItemList.count > 0{
+           
+            
+            
+            self.clickAddProduct = true
+        }else{
+            self.clickAddProduct = false
+        }
+                
+        
+        
+        UIView.animate(withDuration: 0.1, delay: 0) {
+       
+                   self.leadGenerateTableView.reloadSections(IndexSet(integer: 3 + 1), with: .none)
+       
+        }
+    
+
+        
+    
+        
+        
+//        UIView.animate(withDuration: 0.1, delay: 0) {
+//
+//            self.leadGenerateTableView.reloadSections(IndexSet(integer: 3 + 1), with: .none)
+//
+//        }
+        
+    }
+    
+    @objc func productRestButtonAction(_ sender: UIButton){
+        print("list : \(self.scannedAddedItemList)")
+       
+        
+        self.selectedProductDetailInfo = SelectedProductDetailsInfo()
+        
+        
     }
     
     @objc func honorificsButtonAction(sender:UIButton){
@@ -743,6 +1174,7 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
     
     @objc func categoryButtonAction(sender:UIButton){
         self.view.endEditing(true)
+        self.selectedProductDetailInfo = SelectedProductDetailsInfo()
         leadGenerationVm.categoryListAPICall()
     }
     
@@ -879,7 +1311,10 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 50
+        
+        
+            
+        return section == 0 ? self.generalSettingsValue == true ? 50 : 0 : 50
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
@@ -900,7 +1335,7 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
         case 3:
             return 350
         case 4:
-            return 232
+            return 250
         case 5:
             return 55
         case 6:
@@ -963,7 +1398,7 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
         
         //indexImageView.tag = kHeaderSectionTag + section
         indexImageView.backgroundColor = AppColor.Shared.greylight
-        indexImageView.image = UIImage(named: "magnet")
+        indexImageView.image = UIImage(named: images[section])
 //        let label = UILabel(frame: CGRect(x: 48, y: 10, width: headerFrame.width - 96, height: 30))
 //
 //
@@ -1007,7 +1442,7 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
     let cImageView = self.view.viewWithTag(kHeaderSectionTag + self.expandedSectionHeaderNumber) as? UIImageView
     tableViewCollapeSection(self.expandedSectionHeaderNumber, imageView: cImageView!)
     tableViewExpandSection(section, imageView: eImageView!)
-    }
+      }
     }
         
        
@@ -1061,6 +1496,85 @@ extension LeadGenerationVC:UITableViewDelegate,UITableViewDataSource{
     
     
     
+}
+
+
+@available(iOS 14, *)
+extension LeadGenerationVC:PHPickerViewControllerDelegate{
+    fileprivate func uploadedImageConvertToBarCodeString(_ image: UIImage) {
+        DispatchQueue.global(qos: .background).async {
+            
+            let barcodeOptions = BarcodeScannerOptions.init(formats: self.format)
+            let images = VisionImage(image: image)
+            self.visionImage = VisionImage.init(image: image)
+            self.visionImage.orientation = images.orientation
+            let barcodeScanner = BarcodeScanner.barcodeScanner(options: barcodeOptions)
+            
+            sleep(1)
+            do {
+                let barcodes = try barcodeScanner.results(in: images)
+                let displayValue = barcodes.first?.displayValue ?? ""
+                
+                self.found(code: displayValue)
+                
+            } catch let error {
+                print(error.localizedDescription)
+            }
+            
+        }
+    }
+    
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        
+        
+        UIView.animate(withDuration: 3, delay: 0) {
+            self.previewLayer.removeFromSuperlayer()
+            self.scannerBounds.removeFromSuperlayer()
+            self.uploadButton?.removeFromSuperview()
+            self.view.setBGColor(color: AppColor.Shared.colorWhite)
+            self.view.subviews.map{ self.view.showViews(showView: $0) }
+
+            self.dismiss(animated: true)
+        }
+            let itemProviders = results.map(\.itemProvider)
+            for item in itemProviders {
+                if item.canLoadObject(ofClass: UIImage.self) {
+                    item.loadObject(ofClass: UIImage.self) { [self] (image, error) in
+                     
+                            if let image = image as? UIImage {
+                                
+                                uploadedImageConvertToBarCodeString(image)
+
+                            }
+                        
+                    }
+                }
+            }}
+    
+    
+}
+
+extension LeadGenerationVC:UIImagePickerControllerDelegate,UINavigationControllerDelegate{
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        UIView.animate(withDuration: 3, delay: 0) {
+            self.previewLayer.removeFromSuperlayer()
+            self.scannerBounds.removeFromSuperlayer()
+            self.uploadButton?.removeFromSuperview()
+            self.view.setBGColor(color: AppColor.Shared.colorWhite)
+            self.view.subviews.map{ self.view.showViews(showView: $0) }
+
+            self.dismiss(animated: true)
+        }
+      
+        let image = info[UIImagePickerController.InfoKey.originalImage] as! UIImage
+        if #available(iOS 14, *) {
+            uploadedImageConvertToBarCodeString(image)
+        } else {
+            // Fallback on earlier versions
+        }
+        
+    }
 }
 
 extension LeadGenerationVC:UITextFieldDelegate{
@@ -1165,5 +1679,61 @@ extension LeadGenerationVC:LeadDetailsDateDelegate{
     
 }
 
+extension LeadGenerationVC:AttendanceChangeProtocol{
+    func changeAttendance(status: Bool) {
+        self.punchStatus = status
+        
+        
+    }
+    
+    
+}
+
+extension LeadGenerationVC:ExpectedDateProtocol{
+    
+    
+    func expectedDateString(date: String) {
+        
+        
+        expectedDateString = date
+        self.selectedProductDetailInfo.expectedDateString = expectedDateString
+        
+
+    }
+
+    
+    
+}
+
+extension LeadGenerationVC:ProductOfferPriceDelegate{
+    func getOfferPrice(value: String) {
+        let mrp = self.selectedProductDetailInfo.MRP == "" ? "0.00" : self.selectedProductDetailInfo.MRP
+        
+        let offerPrice = value == "" ? "0.00" : value
+        
+        switch Int(mrp){
+        case 0:
+            self.selectedProductDetailInfo.Price = value
+        default:
+            if Double(mrp)! > Double(offerPrice)! {
+                self.selectedProductDetailInfo.Price = value
+            }else {
+                
+                if mrp != "0.00" {
+                self.popupAlert(title: "", message: "Offer price cannot exceed MRP price", actionTitles: [closeTitle], actions: [{action1 in
+                    self.selectedProductDetailInfo.Price = "0.00"
+                },nil])
+                }else{
+                    self.selectedProductDetailInfo.Price = value
+                }
+                
+            }
+        }
+        
+        
+    }
+    
+    
+}
 
 
